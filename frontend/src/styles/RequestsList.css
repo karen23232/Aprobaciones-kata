@@ -1,0 +1,374 @@
+/* ========================================
+   REQUESTS LIST - BANCO DE BOGOTÁ
+   ======================================== */
+
+.requests-page {
+    min-height: calc(100vh - 82px);
+    background: linear-gradient(
+        135deg,
+        rgba(0, 61, 165, 0.03) 0%,
+        rgba(255, 209, 0, 0.03) 50%,
+        rgba(0, 61, 165, 0.03) 100%
+    );
+}
+
+/* ========================================
+   HEADER - COLORES BANCO DE BOGOTÁ
+   ======================================== */
+.page-header {
+    background: linear-gradient(135deg, #003da5 0%, #002875 100%);
+    color: #ffffff;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 61, 165, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.page-header .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Logo del Banco */
+.bank-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.page-header h1 {
+    flex: 1;
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Botón Volver */
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #ffd100;
+    border-color: #ffd100;
+    color: #003da5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 209, 0, 0.4);
+}
+
+/* Botón Nueva Solicitud */
+.btn-primary {
+    background: linear-gradient(135deg, #ffd100 0%, #ffb800 100%);
+    color: #003da5;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(255, 209, 0, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #ffb800 0%, #ffa500 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 209, 0, 0.5);
+}
+
+/* ========================================
+   CONTENIDO
+   ======================================== */
+.page-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ========================================
+   FILTROS Y BÚSQUEDA
+   ======================================== */
+.filters-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    padding: 0.375rem;
+    border-radius: 10px;
+    border: 2px solid #003da5;
+}
+
+.filter-tab {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: #003da5;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.filter-tab:hover {
+    background: rgba(0, 61, 165, 0.1);
+    color: #002875;
+}
+
+.filter-tab.active {
+    background: linear-gradient(135deg, #003da5 0%, #0051d5 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.3);
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    border: 2px solid #003da5;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    min-width: 300px;
+    transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+    border-color: #002875;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+}
+
+.search-box svg {
+    color: #003da5;
+    flex-shrink: 0;
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 0.938rem;
+    color: #1f2937;
+}
+
+.search-box input::placeholder {
+    color: #9ca3af;
+}
+
+/* ========================================
+   LOADING
+   ======================================== */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 1rem;
+}
+
+/* ========================================
+   TABLA DE SOLICITUDES
+   ======================================== */
+.requests-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.request-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.request-row:hover {
+    border-color: #003da5;
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.15);
+    transform: translateX(4px);
+    background: linear-gradient(to right, #ffffff 0%, #f8f9ff 100%);
+}
+
+.request-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.request-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.request-title-table {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #003da5;
+    margin: 0;
+}
+
+/* CÓDIGO ÚNICO - COLORES BANCO DE BOGOTÁ */
+.request-code-table {
+    display: inline-block;
+    font-size: 0.813rem;
+    color: #003da5;
+    font-family: "Courier New", monospace;
+    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 2px solid #003da5;
+    box-shadow: 0 2px 4px rgba(0, 61, 165, 0.1);
+}
+
+.request-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    flex-wrap: wrap;
+}
+
+.request-type-table {
+    font-weight: 600;
+    color: #003da5;
+}
+
+.request-separator {
+    color: #d1d5db;
+}
+
+.request-user {
+    color: #4b5563;
+}
+
+.request-date {
+    color: #9ca3af;
+}
+
+.request-status {
+    flex-shrink: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1024px) {
+    .page-content {
+        padding: 1.5rem;
+    }
+
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header .header-content {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .page-header h1 {
+        text-align: center;
+        font-size: 1.5rem;
+        width: 100%;
+        order: 1;
+    }
+
+    .back-btn {
+        order: 0;
+    }
+
+    .btn-primary {
+        order: 2;
+        width: 100%;
+    }
+
+    .bank-logo {
+        width: 40px;
+        height: 40px;
+        order: 0;
+    }
+
+    .page-content {
+        padding: 1rem;
+    }
+
+    .filter-tabs {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .filter-tab {
+        flex: 1;
+        min-width: calc(50% - 0.25rem);
+    }
+
+    .request-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .request-status {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .bank-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .page-header h1 {
+        font-size: 1.25rem;
+    }
+}

@@ -1,0 +1,555 @@
+/* ========================================
+   CREATE REQUEST - BANCO DE BOGOTÁ
+   Colores corporativos aplicados
+   ======================================== */
+
+.create-request-page {
+    min-height: calc(100vh - 82px);
+    background: linear-gradient(
+        135deg,
+        rgba(0, 61, 165, 0.03) 0%,
+        rgba(255, 209, 0, 0.03) 50%,
+        rgba(0, 61, 165, 0.03) 100%
+    );
+}
+
+/* ========================================
+   HEADER - COLORES BANCO DE BOGOTÁ
+   ======================================== */
+.page-header {
+    background: linear-gradient(135deg, #003da5 0%, #002875 100%);
+    color: #ffffff;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 61, 165, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Logo del Banco */
+.bank-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.header-content h1 {
+    flex: 1;
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Botón Volver */
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #ffd100;
+    border-color: #ffd100;
+    color: #003da5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 209, 0, 0.4);
+}
+
+.back-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ========================================
+   CONTENIDO PRINCIPAL
+   ======================================== */
+.page-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.form-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* ========================================
+   FORM HEADER
+   ======================================== */
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid #003da5;
+}
+
+.form-header h2 {
+    font-size: 1.75rem;
+    color: #003da5;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+
+.form-header p {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ========================================
+   FORMULARIO
+   ======================================== */
+.create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 0.938rem;
+    font-weight: 600;
+    color: #003da5;
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: #ef4444;
+}
+
+/* Inputs y Selects */
+.form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #003da5;
+    box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.form-input.error {
+    border-color: #ef4444;
+}
+
+/* Textarea */
+.form-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    background-color: #ffffff;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #003da5;
+    box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+}
+
+.form-textarea::placeholder {
+    color: #9ca3af;
+}
+
+.form-textarea.error {
+    border-color: #ef4444;
+}
+
+.input-hint {
+    font-size: 0.813rem;
+    color: #9ca3af;
+    margin-top: 0.375rem;
+}
+
+/* Descripción del tipo */
+.type-description {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    border-left: 3px solid #003da5;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #003da5;
+    font-weight: 500;
+}
+
+/* ========================================
+   FILE UPLOAD - COLORES BANCO DE BOGOTÁ
+   ======================================== */
+.file-upload-container {
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px dashed #003da5;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #003da5;
+    font-weight: 500;
+}
+
+.file-label:hover {
+    border-color: #002875;
+    background: linear-gradient(135deg, #e8f0ff 0%, #f9fafb 100%);
+    color: #002875;
+}
+
+.file-label svg {
+    color: #003da5;
+}
+
+.file-label:hover svg {
+    color: #002875;
+}
+
+.file-selected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    border: 2px solid #003da5;
+    border-radius: 8px;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.file-info svg {
+    color: #003da5;
+    flex-shrink: 0;
+}
+
+.file-name {
+    font-size: 0.875rem;
+    color: #003da5;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.file-size {
+    font-size: 0.75rem;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.file-remove-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: #ef4444;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.file-remove-btn:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* ========================================
+   INFO BOX
+   ======================================== */
+.form-info {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    border-left: 3px solid #003da5;
+    border-radius: 8px;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.info-content {
+    font-size: 0.875rem;
+    color: #003da5;
+    line-height: 1.5;
+}
+
+.info-content strong {
+    font-weight: 700;
+}
+
+/* ========================================
+   BOTONES DE ACCIÓN
+   ======================================== */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+.form-actions .btn {
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Botón Primario - Banco de Bogotá */
+.btn-primary {
+    background: linear-gradient(135deg, #003da5 0%, #0051d5 100%);
+    color: #ffffff;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #002875 0%, #003da5 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 61, 165, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Botón Secundario */
+.btn-secondary {
+    background-color: rgba(0, 61, 165, 0.1);
+    color: #003da5;
+    border: 2px solid #003da5;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #003da5;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.3);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   SIDEBAR DE CONSEJOS
+   ======================================== */
+.info-sidebar {
+    background: linear-gradient(to bottom, #ffffff 0%, #f8f9ff 100%);
+    border: 3px solid #003da5 !important;
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.15) !important;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.info-sidebar h3 {
+    font-size: 1.25rem;
+    color: #003da5;
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+    text-align: center;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tips-list li {
+    font-size: 0.875rem;
+    color: #4b5563;
+    line-height: 1.5;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.tips-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.tips-list strong {
+    color: #003da5;
+    font-weight: 700;
+}
+
+/* ========================================
+   ALERTAS
+   ======================================== */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #fecaca;
+}
+
+.error-message {
+    display: block;
+    color: #ef4444;
+    font-size: 0.813rem;
+    margin-top: 0.375rem;
+    font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1024px) {
+    .form-container {
+        grid-template-columns: 1fr;
+    }
+
+    .info-sidebar {
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding: 1rem;
+    }
+
+    .header-content {
+        flex-wrap: wrap;
+    }
+
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .back-btn {
+        font-size: 0.813rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    .file-label span {
+        font-size: 0.875rem;
+    }
+
+    .file-selected {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .file-remove-btn {
+        align-self: flex-end;
+    }
+
+    .bank-logo {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content h1 {
+        font-size: 1.25rem;
+    }
+
+    .bank-logo {
+        width: 36px;
+        height: 36px;
+    }
+}

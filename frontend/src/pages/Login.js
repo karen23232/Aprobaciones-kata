@@ -55,7 +55,7 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
 
@@ -71,7 +71,6 @@ const Login = () => {
         password: formData.password,
       });
 
-      // Redirigir al dashboard
       navigate('/dashboard');
     } catch (error) {
       console.error('Error en login:', error);
@@ -83,7 +82,16 @@ const Login = () => {
         });
         setErrors(newErrors);
       } else {
-        setApiError(error.message || 'Error al iniciar sesión. Por favor intenta de nuevo.');
+        // Mensajes de error más específicos
+        let errorMessage = 'Error al iniciar sesión. Por favor intenta de nuevo.';
+        
+        if (error.message?.includes('Credenciales inválidas')) {
+          errorMessage = '❌ Email o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
+        } else if (error.message?.includes('no encontrado')) {
+          errorMessage = '❌ No existe una cuenta con este email. ¿Deseas registrarte?';
+        }
+        
+        setApiError(errorMessage);
       }
     } finally {
       setLoading(false);
@@ -112,6 +120,7 @@ const Login = () => {
             <label htmlFor="email" className="form-label">
               Correo Electrónico
             </label>
+
             <input
               type="email"
               id="email"
@@ -129,6 +138,9 @@ const Login = () => {
             <label htmlFor="password" className="form-label">
               Contraseña
             </label>
+            <div className="form-group">
+            <label htmlFor="password" className="form-label">
+            </label>
             <PasswordInput
               value={formData.password}
               onChange={handleChange}
@@ -136,6 +148,15 @@ const Login = () => {
               name="password"
               error={errors.password}
             />
+            <div className="forgot-password">
+              <a href="#" onClick={(e) => {
+                e.preventDefault();
+                alert('Funcionalidad de recuperación de contraseña en desarrollo. Por favor contacta al administrador.');
+              }}>
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+          </div>
           </div>
 
           <button

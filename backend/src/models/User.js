@@ -56,6 +56,27 @@ class User {
   static async comparePassword(plainPassword, hashedPassword) {
     return await bcrypt.compare(plainPassword, hashedPassword);
   }
+  // ... código anterior ...
+
+  // Obtener usuarios aprobadores
+  static async getApprovers() {
+    try {
+      const query = `
+        SELECT id, email, nombre, rol 
+        FROM Usuarios_RI 
+        WHERE rol IN ('aprobador', 'admin')
+        ORDER BY nombre
+      `;
+      
+      const result = await pool.query(query);
+      return result.rows;
+      
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = User;
+
+

@@ -68,11 +68,13 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setLoading(true);
 
@@ -87,13 +89,24 @@ const Register = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Error en registro:', error);
-
+      
       if (error.errors && Array.isArray(error.errors)) {
         const newErrors = {};
-        error.errors.forEach((err) => (newErrors[err.field] = err.message));
+        error.errors.forEach(err => {
+          newErrors[err.field] = err.message;
+        });
         setErrors(newErrors);
       } else {
-        setApiError(error.message || 'Error al registrar usuario. Intenta de nuevo.');
+        // Mensajes mejorados
+        let errorMessage = 'Error al registrar usuario. Por favor intenta de nuevo.';
+        
+        if (error.message?.includes('ya está registrado') || error.message?.includes('ya existe')) {
+          errorMessage = '❌ Este email ya está registrado. Intenta con otro correo o inicia sesión.';
+        } else if (error.message?.includes('email')) {
+          errorMessage = '❌ Email inválido o ya en uso.';
+        }
+        
+        setApiError(errorMessage);
       }
     } finally {
       setLoading(false);

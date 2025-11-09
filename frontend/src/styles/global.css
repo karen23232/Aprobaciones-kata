@@ -1,3 +1,7 @@
+/* ========================================
+   GLOBAL STYLES - BANCO DE BOGOTÁ
+   ======================================== */
+
 /* Reset y Variables */
 * {
     margin: 0;
@@ -6,12 +10,36 @@
 }
 
 :root {
-    --primary: #667eea;
-    --primary-dark: #764ba2;
+    /* ========================================
+       🏦 COLORES BANCO DE BOGOTÁ
+       ======================================== */
+    --banco-azul-principal: #003da5;
+    --banco-azul-oscuro: #002875;
+    --banco-azul-claro: #0051d5;
+    --banco-amarillo: #ffd100;
+    --banco-amarillo-oscuro: #ffb800;
+
+    /* Fondos azules claros */
+    --banco-azul-muy-claro: #e8f0ff;
+    --banco-azul-suave: #d0e2ff;
+    --banco-azul-pastel: #f8f9ff;
+
+    /* Colores principales (Banco de Bogotá) */
+    --primary: #003da5;
+    --primary-dark: #002875;
+    --primary-light: #0051d5;
+
+    /* Colores de estado */
     --success: #10b981;
+    --success-dark: #059669;
     --danger: #ef4444;
+    --danger-dark: #dc2626;
     --warning: #f59e0b;
+    --warning-dark: #d97706;
     --info: #3b82f6;
+    --info-dark: #2563eb;
+
+    /* Escala de grises */
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -22,11 +50,33 @@
     --gray-700: #374151;
     --gray-800: #1f2937;
     --gray-900: #111827;
+
+    /* Sombras con el azul del banco */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 61, 165, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 61, 165, 0.15);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 61, 165, 0.2);
+
+    /* Sombras del amarillo dorado */
+    --shadow-amarillo: 0 4px 12px rgba(255, 209, 0, 0.4);
+
+    /* Transiciones */
+    --transition-fast: 150ms ease-in-out;
+    --transition-base: 200ms ease-in-out;
+    --transition-slow: 300ms ease-in-out;
+
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-base: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 }
 
 /* Base */
 html {
     font-size: 16px;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -37,6 +87,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: var(--gray-900);
     background-color: var(--gray-50);
+    line-height: 1.5;
 }
 
 code {
@@ -44,7 +95,7 @@ code {
         monospace;
 }
 
-/* Scrollbar */
+/* Scrollbar personalizado - COLORES BANCO DE BOGOTÁ */
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -55,22 +106,350 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--gray-400);
+    background: linear-gradient(
+        135deg,
+        var(--banco-azul-principal) 0%,
+        var(--banco-azul-oscuro) 100%
+    );
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--gray-500);
+    background: linear-gradient(
+        135deg,
+        var(--banco-azul-oscuro) 0%,
+        var(--banco-azul-principal) 100%
+    );
 }
 
-/* Selection */
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--banco-azul-principal) var(--gray-100);
+}
+
+/* Selection - COLORES BANCO DE BOGOTÁ */
 ::selection {
-    background-color: var(--primary);
+    background-color: var(--banco-azul-principal);
     color: #ffffff;
 }
 
-/* Focus Visible */
+::-moz-selection {
+    background-color: var(--banco-azul-principal);
+    color: #ffffff;
+}
+
+/* Focus Visible - BANCO DE BOGOTÁ */
 *:focus-visible {
-    outline: 2px solid var(--primary);
+    outline: 2px solid var(--banco-azul-principal);
     outline-offset: 2px;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--gray-900);
+}
+
+h1 {
+    font-size: 2.25rem;
+}
+
+h2 {
+    font-size: 1.875rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+/* Links - BANCO DE BOGOTÁ */
+a {
+    color: var(--banco-azul-principal);
+    text-decoration: none;
+    transition: color var(--transition-base);
+}
+
+a:hover {
+    color: var(--banco-azul-oscuro);
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Buttons Base */
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Inputs y Forms */
+input,
+textarea,
+select {
+    font-family: inherit;
+}
+
+/* ========================================
+   UTILITIES - COLORES BANCO DE BOGOTÁ
+   ======================================== */
+
+.bg-banco-azul {
+    background: linear-gradient(
+        135deg,
+        var(--banco-azul-principal) 0%,
+        var(--banco-azul-oscuro) 100%
+    );
+}
+
+.bg-banco-amarillo {
+    background: linear-gradient(
+        135deg,
+        var(--banco-amarillo) 0%,
+        var(--banco-amarillo-oscuro) 100%
+    );
+}
+
+.text-banco-azul {
+    color: var(--banco-azul-principal);
+}
+
+.text-banco-amarillo {
+    color: var(--banco-amarillo);
+}
+
+.border-banco-azul {
+    border-color: var(--banco-azul-principal);
+}
+
+.border-banco-amarillo {
+    border-color: var(--banco-amarillo);
+}
+
+/* Text alignment */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Font weights */
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Spacing utilities */
+.mt-1 {
+    margin-top: 0.25rem;
+}
+.mt-2 {
+    margin-top: 0.5rem;
+}
+.mt-3 {
+    margin-top: 0.75rem;
+}
+.mt-4 {
+    margin-top: 1rem;
+}
+.mt-5 {
+    margin-top: 1.25rem;
+}
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+.mb-3 {
+    margin-bottom: 0.75rem;
+}
+.mb-4 {
+    margin-bottom: 1rem;
+}
+.mb-5 {
+    margin-bottom: 1.25rem;
+}
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in-up {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+@media (max-width: 1536px) {
+    html {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 1280px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 1024px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.375rem;
+    }
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    body {
+        background: white;
+    }
+
+    .no-print {
+        display: none !important;
+    }
 }
