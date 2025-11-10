@@ -6,13 +6,13 @@ Para correr correctamente el proyecto, sigue los pasos a continuación:
 
 Asegúrate de tener el proyecto en tu equipo.
 
-2. Instalar dependencias
+2 Instalar dependencias
 
 Antes de ejecutar cualquier parte del proyecto, instala las dependencias necesarias en ambas carpetas (frontend y backend):
 
 # En la carpeta del frontend
 
-cd fronted
+cd frontend
 npm install
 
 # En la carpeta del backend
@@ -25,7 +25,7 @@ npm install
 Abre dos terminales (una para el frontend y otra para el backend):
 
 Terminal 1 — Frontend
-cd frotend
+cd frontend
 npm start
 
 Terminal 2 — Backend
@@ -34,6 +34,8 @@ npm run dev
 
 4. Verificar ejecución
 
-El frontend se ejecutará en el puerto por defecto de React (generalmente http://localhost:3000/).
+El frontend se ejecutará en el puerto por defecto de React:
+http://localhost:3000/
 
-El backend se ejecutará en el puerto configurado en tu servidor (por ejemplo, http://localhost:5000/).
+El backend se ejecutará en el puerto configurado en tu servidor (por ejemplo):
+http://localhost:5000/
