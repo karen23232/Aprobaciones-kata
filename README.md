@@ -38,4 +38,4 @@ El frontend se ejecutará en el puerto por defecto de React:
 http://localhost:3000/
 
 El backend se ejecutará en el puerto configurado en tu servidor (por ejemplo):
-http://localhost:5000/
+http://localhost:3000
