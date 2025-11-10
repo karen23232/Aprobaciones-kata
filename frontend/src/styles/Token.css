@@ -1,0 +1,199 @@
+/* ========================================
+   ESTILOS PARA FORGOT PASSWORD - TOKEN
+   Agregar al final de Auth.css
+   ======================================== */
+
+/* Contenedor del token - FORZADO */
+.token-container {
+    background: white !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    display: block !important;
+}
+
+/* Header del token */
+.token-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.token-icon {
+    font-size: 22px !important;
+}
+
+.token-title {
+    color: #1f2937 !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+}
+
+/* Descripción */
+.token-description {
+    color: #4b5563 !important;
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+    font-weight: 500 !important;
+    margin-top: 0 !important;
+}
+
+/* Caja del token */
+.token-box {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    max-height: 120px !important;
+    overflow-y: auto !important;
+}
+
+/* Scrollbar personalizado para la caja del token */
+.token-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.token-box::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+}
+
+.token-box::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.token-box::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Código del token */
+.token-code {
+    color: #1f2937 !important;
+    font-family: "Courier New", Courier, monospace !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    word-break: break-all !important;
+    line-height: 1.8 !important;
+    display: block !important;
+    user-select: all !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Botón copiar token */
+.btn-copy-token {
+    width: 100% !important;
+    padding: 12px !important;
+    background: #2563eb !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+}
+
+.btn-copy-token:hover {
+    background: #1d4ed8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+.btn-copy-token:active {
+    transform: translateY(0);
+}
+
+/* Estado copiado */
+.btn-copy-token.copied {
+    background: #10b981 !important;
+}
+
+.btn-copy-token.copied:hover {
+    background: #10b981 !important;
+    transform: none;
+}
+
+/* Texto de ayuda */
+.token-hint {
+    color: #6b7280 !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    margin-top: 12px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Link "Ya tengo mi token" */
+.token-link-container {
+    margin-top: 20px !important;
+    text-align: center !important;
+}
+
+.token-link {
+    color: #2563eb !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    transition: color 0.2s ease !important;
+}
+
+.token-link:hover {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+}
+
+/* Link del footer */
+.auth-footer-link {
+    color: #2563eb !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: color 0.2s ease !important;
+}
+
+.auth-footer-link:hover {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+}
+
+/* Texto del alert success */
+.alert-success-text {
+    margin-top: 8px !important;
+    font-size: 14px !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+    .token-container {
+        padding: 20px 16px !important;
+    }
+
+    .token-code {
+        font-size: 12px !important;
+    }
+
+    .btn-copy-token {
+        padding: 10px !important;
+        font-size: 13px !important;
+    }
+
+    .token-icon {
+        font-size: 20px !important;
+    }
+
+    .token-title {
+        font-size: 16px !important;
+    }
+}

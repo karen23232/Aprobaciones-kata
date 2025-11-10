@@ -1,6 +1,52 @@
 import api from './api';
 
 const authService = {
+  // Solicitar recuperación de contraseña
+  forgotPassword: async (email) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      // ✅ CORRECCIÓN: Asegurar que siempre haya un mensaje de error
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error al solicitar recuperación de contraseña';
+      
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Restablecer contraseña con token
+  resetPassword: async (token, newPassword) => {
+    try {
+      const response = await api.post('/auth/reset-password', { 
+        token, 
+        newPassword 
+      });
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error al restablecer la contraseña';
+      
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Verificar si un token es válido
+  verifyResetToken: async (token) => {
+    try {
+      const response = await api.get(`/auth/verify-reset-token/${token}`);
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Token inválido o expirado';
+      
+      throw new Error(errorMessage);
+    }
+  },
+
   // Registro de usuario
   register: async (userData) => {
     try {
@@ -13,7 +59,11 @@ const authService = {
       
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Error de conexión' };
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error de conexión';
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -29,7 +79,11 @@ const authService = {
       
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Error de conexión' };
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error de conexión';
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -56,7 +110,11 @@ const authService = {
       const response = await api.get('/auth/profile');
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Error de conexión' };
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error de conexión';
+      
+      throw new Error(errorMessage);
     }
   },
 };

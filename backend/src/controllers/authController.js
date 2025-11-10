@@ -3,50 +3,60 @@ const jwt = require('jsonwebtoken');
 
 // Generar JWT
 const generateToken = (userId) => {
-  return jwt.sign(
-    { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || '7d'
+  });
 };
 
-// Registro de usuario
-exports.register = async (req, res) => {
+// ==================== REGISTRO ====================
+const register = async (req, res) => {
   try {
-    const { email, password, nombre, rol } = req.body;
-    
+    const { nombre, email, password, rol } = req.body;
+
+    // Validaciones básicas
+    if (!nombre || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Todos los campos son requeridos'
+      });
+    }
+
     // Verificar si el usuario ya existe
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
-      return res.status(409).json({
+      return res.status(400).json({
         success: false,
         message: 'El email ya está registrado'
       });
     }
-    
-    // Crear usuario
-    const newUser = await User.create({ email, password, nombre, rol });
-    
+
+    // Crear usuario (asume que tienes un método User.create)
+    const user = await User.create({
+      nombre,
+      email,
+      password,
+      rol: rol || 'usuario'
+    });
+
     // Generar token
-    const token = generateToken(newUser.id);
-    
+    const token = generateToken(user.id);
+
     res.status(201).json({
       success: true,
       message: 'Usuario registrado exitosamente',
       data: {
         user: {
-          id: newUser.id,
-          email: newUser.email,
-          nombre: newUser.nombre,
-          rol: newUser.rol,
-          created_at: newUser.created_at
+          id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          rol: user.rol
         },
         token
       }
     });
-    
+
   } catch (error) {
-    console.error('Error en registro:', error);
+    console.error('Error en register:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Error al registrar usuario'
@@ -54,11 +64,19 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login de usuario
-exports.login = async (req, res) => {
+// ==================== LOGIN ====================
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
+    // Validaciones
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y contraseña son requeridos'
+      });
+    }
+
     // Buscar usuario
     const user = await User.findByEmail(email);
     if (!user) {
@@ -67,8 +85,8 @@ exports.login = async (req, res) => {
         message: 'Credenciales inválidas'
       });
     }
-    
-    // Verificar contraseña
+
+    // Verificar contraseña (asume que tienes un método User.comparePassword)
     const isPasswordValid = await User.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -76,38 +94,48 @@ exports.login = async (req, res) => {
         message: 'Credenciales inválidas'
       });
     }
-    
+
+    // Verificar si está activo
+    if (!user.activo) {
+      return res.status(403).json({
+        success: false,
+        message: 'Cuenta desactivada. Contacta al administrador'
+      });
+    }
+
     // Generar token
     const token = generateToken(user.id);
-    
+
     res.status(200).json({
       success: true,
       message: 'Login exitoso',
       data: {
         user: {
           id: user.id,
-          email: user.email,
           nombre: user.nombre,
-          rol: user.rol,
-          created_at: user.created_at
+          email: user.email,
+          rol: user.rol
         },
         token
       }
     });
-    
+
   } catch (error) {
     console.error('Error en login:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al iniciar sesión'
+      message: error.message || 'Error al iniciar sesión'
     });
   }
 };
 
-// Obtener perfil del usuario autenticado
-exports.getProfile = async (req, res) => {
+// ==================== OBTENER PERFIL ====================
+const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    // El middleware 'protect' ya validó el token y agregó req.user
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
     
     if (!user) {
       return res.status(404).json({
@@ -115,17 +143,182 @@ exports.getProfile = async (req, res) => {
         message: 'Usuario no encontrado'
       });
     }
-    
+
     res.status(200).json({
       success: true,
-      data: { user }
+      data: {
+        id: user.id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol,
+        activo: user.activo
+      }
     });
-    
+
   } catch (error) {
-    console.error('Error al obtener perfil:', error);
+    console.error('Error en getProfile:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener perfil'
+      message: error.message || 'Error al obtener perfil'
     });
   }
+};
+
+// ==================== FORGOT PASSWORD ====================
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validar email
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'El email es requerido'
+      });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El formato del email es inválido'
+      });
+    }
+
+    // Generar token de recuperación
+    const result = await User.createPasswordResetToken(email);
+
+    if (!result) {
+      // Por seguridad, no revelar si el email existe o no
+      return res.status(200).json({
+        success: true,
+        message: 'Si el email existe, recibirás instrucciones para recuperar tu contraseña'
+      });
+    }
+
+    const { user, resetToken } = result;
+
+    // 🎯 IMPORTANTE: En producción esto se enviaría por email
+    // Para desarrollo/localhost, lo mostramos en consola
+    console.log('\n' + '='.repeat(60));
+    console.log('🔐 TOKEN DE RECUPERACIÓN DE CONTRASEÑA');
+    console.log('='.repeat(60));
+    console.log(`Usuario: ${user.nombre} (${user.email})`);
+    console.log(`Token: ${resetToken}`);
+    console.log(`Expira en: 1 hora`);
+    console.log('='.repeat(60) + '\n');
+
+    // En localhost, devolvemos el token en la respuesta (SOLO PARA DESARROLLO)
+    res.status(200).json({
+      success: true,
+      message: 'Token de recuperación generado exitosamente',
+      // ⚠️ ELIMINAR ESTO EN PRODUCCIÓN
+      devToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+    });
+
+  } catch (error) {
+    console.error('Error en forgotPassword:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al procesar la solicitud'
+    });
+  }
+};
+
+// ==================== RESET PASSWORD ====================
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Validaciones
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token y nueva contraseña son requeridos'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    // Buscar usuario por token
+    const user = await User.findByResetToken(token);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token inválido o expirado'
+      });
+    }
+
+    // Actualizar contraseña
+    await User.updatePassword(user.id, newPassword);
+
+    console.log(`✅ Contraseña actualizada para: ${user.email}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Contraseña actualizada exitosamente. Ya puedes iniciar sesión.'
+    });
+
+  } catch (error) {
+    console.error('Error en resetPassword:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al restablecer la contraseña'
+    });
+  }
+};
+
+// ==================== VERIFY RESET TOKEN ====================
+const verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token es requerido'
+      });
+    }
+
+    const user = await User.findByResetToken(token);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token inválido o expirado'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token válido',
+      data: {
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en verifyResetToken:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al verificar el token'
+    });
+  }
+};
+
+// ==================== EXPORTAR TODOS LOS MÉTODOS ====================
+module.exports = {
+  register,
+  login,
+  getProfile,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken
 };

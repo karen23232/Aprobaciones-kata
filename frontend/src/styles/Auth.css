@@ -352,3 +352,27 @@
         transform: rotate(360deg);
     }
 }
+
+.forgot-password {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #030303ff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.forgot-password a:hover {
+    color: #d97706;
+    text-decoration: underline;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+}

@@ -1,82 +1,269 @@
 const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 class User {
   
-  // Crear usuario
-  static async create({ email, password, nombre, rol = 'solicitante' }) {
+  // ==================== NORMALIZAR EMAIL ====================
+  static normalizeEmail(email) {
+    if (!email) return '';
+    return email.toLowerCase().trim();
+  }
+  
+  // ==================== CREAR USUARIO ====================
+  static async create(userData) {
     try {
+      const { nombre, email, password, rol = 'usuario' } = userData;
+
       // Hashear contraseña
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(password, salt);
-      
+
       const query = `
-        INSERT INTO Usuarios_RI (email, password, nombre, rol)
+        INSERT INTO Usuarios_RI (nombre, email, password, rol)
         VALUES ($1, $2, $3, $4)
-        RETURNING id, email, nombre, rol, created_at
+        RETURNING id, nombre, email, rol, created_at
       `;
-      
-      const values = [email, hashedPassword, nombre, rol];
-      const result = await pool.query(query, values);
-      
+
+      const result = await pool.query(query, [
+        nombre,
+        this.normalizeEmail(email),
+        hashedPassword,
+        rol
+      ]);
+
+      console.log(`✅ Usuario creado: ${result.rows[0].email}`);
       return result.rows[0];
+
     } catch (error) {
-      if (error.code === '23505') { // Unique violation
+      console.error('Error en User.create:', error);
+      
+      // Error de email duplicado
+      if (error.code === '23505') {
         throw new Error('El email ya está registrado');
       }
-      throw error;
+      
+      throw new Error(`Error al crear usuario: ${error.message}`);
     }
   }
-  
-  // Buscar por email
+
+  // ==================== BUSCAR POR EMAIL ====================
   static async findByEmail(email) {
     try {
-      const query = 'SELECT * FROM Usuarios_RI WHERE email = $1';
-      const result = await pool.query(query, [email]);
+      const normalizedEmail = this.normalizeEmail(email);
       
-      return result.rows[0] || null;
-    } catch (error) {
-      throw error;
-    }
-  }
-  
-  // Buscar por ID
-  static async findById(id) {
-    try {
-      const query = 'SELECT id, email, nombre, rol, created_at FROM Usuarios_RI WHERE id = $1';
-      const result = await pool.query(query, [id]);
-      
-      return result.rows[0] || null;
-    } catch (error) {
-      throw error;
-    }
-  }
-  
-  // Comparar contraseñas
-  static async comparePassword(plainPassword, hashedPassword) {
-    return await bcrypt.compare(plainPassword, hashedPassword);
-  }
-  // ... código anterior ...
+      const query = `
+        SELECT id, email, nombre, password, rol, activo
+        FROM Usuarios_RI 
+        WHERE LOWER(TRIM(email)) = $1
+      `;
 
-  // Obtener usuarios aprobadores
-  static async getApprovers() {
+      const result = await pool.query(query, [normalizedEmail]);
+      return result.rows[0] || null;
+      
+    } catch (error) {
+      console.error('Error en findByEmail:', error);
+      throw new Error(`Error al buscar usuario: ${error.message}`);
+    }
+  }
+
+  // ==================== BUSCAR POR ID ====================
+  static async findById(userId) {
     try {
+      const query = `
+        SELECT id, email, nombre, rol, activo, created_at
+        FROM Usuarios_RI 
+        WHERE id = $1
+      `;
+
+      const result = await pool.query(query, [userId]);
+      return result.rows[0] || null;
+      
+    } catch (error) {
+      console.error('Error en findById:', error);
+      throw new Error(`Error al buscar usuario: ${error.message}`);
+    }
+  }
+
+  // ==================== COMPARAR CONTRASEÑA ====================
+  static async comparePassword(plainPassword, hashedPassword) {
+    try {
+      return await bcrypt.compare(plainPassword, hashedPassword);
+    } catch (error) {
+      console.error('Error en comparePassword:', error);
+      throw new Error('Error al verificar contraseña');
+    }
+  }
+
+  // ==================== GENERAR TOKEN DE RECUPERACIÓN ====================
+  static async createPasswordResetToken(email) {
+    try {
+      const normalizedEmail = this.normalizeEmail(email);
+      
+      const user = await this.findByEmail(normalizedEmail);
+      
+      if (!user) {
+        console.log(`⚠️ Intento de recuperación para email no registrado: ${normalizedEmail}`);
+        return null;
+      }
+
+      // Generar token aleatorio seguro (64 caracteres)
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      // Hash del token para guardarlo en BD (seguridad)
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+      // Token expira en 1 hora
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+      const query = `
+        UPDATE Usuarios_RI 
+        SET reset_password_token = $1, 
+            reset_password_expires = $2
+        WHERE LOWER(TRIM(email)) = $3
+        RETURNING id, email, nombre
+      `;
+
+      const result = await pool.query(query, [hashedToken, expiresAt, normalizedEmail]);
+
+      if (result.rows.length === 0) {
+        throw new Error('No se pudo actualizar el token de recuperación');
+      }
+
+      console.log(`✅ Token de recuperación generado para: ${normalizedEmail}`);
+
+      return {
+        user: result.rows[0],
+        resetToken // Retornamos el token sin hashear (este se envía al usuario)
+      };
+      
+    } catch (error) {
+      console.error('Error en createPasswordResetToken:', error);
+      throw new Error(`Error al generar token de recuperación: ${error.message}`);
+    }
+  }
+
+  // ==================== VERIFICAR TOKEN Y OBTENER USUARIO ====================
+  static async findByResetToken(token) {
+    try {
+      if (!token) {
+        return null;
+      }
+
+      // Hash del token recibido
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
       const query = `
         SELECT id, email, nombre, rol 
         FROM Usuarios_RI 
-        WHERE rol IN ('aprobador', 'admin')
-        ORDER BY nombre
+        WHERE reset_password_token = $1 
+          AND reset_password_expires > NOW()
       `;
+
+      const result = await pool.query(query, [hashedToken]);
       
+      if (result.rows.length === 0) {
+        console.log('⚠️ Token inválido o expirado');
+        return null;
+      }
+
+      console.log(`✅ Token válido encontrado para: ${result.rows[0].email}`);
+      return result.rows[0];
+      
+    } catch (error) {
+      console.error('Error en findByResetToken:', error);
+      throw new Error(`Error al verificar token: ${error.message}`);
+    }
+  }
+
+  // ==================== ACTUALIZAR CONTRASEÑA ====================
+  static async updatePassword(userId, newPassword) {
+    try {
+      if (!userId || !newPassword) {
+        throw new Error('User ID y contraseña son requeridos');
+      }
+
+      // Hashear nueva contraseña
+      const salt = await bcrypt.genSalt(12);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      const query = `
+        UPDATE Usuarios_RI 
+        SET password = $1,
+            reset_password_token = NULL,
+            reset_password_expires = NULL
+        WHERE id = $2
+        RETURNING id, email, nombre
+      `;
+
+      const result = await pool.query(query, [hashedPassword, userId]);
+      
+      if (result.rows.length === 0) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      console.log(`✅ Contraseña actualizada para usuario: ${result.rows[0].email}`);
+      return result.rows[0];
+      
+    } catch (error) {
+      console.error('Error en updatePassword:', error);
+      throw new Error(`Error al actualizar contraseña: ${error.message}`);
+    }
+  }
+
+  // ==================== OBTENER APROBADORES ====================
+  // 🎯 ESTE ES EL MÉTODO QUE FALTABA Y CAUSABA EL ERROR 500
+  static async getApprovers() {
+    try {
+      const query = `
+        SELECT id, nombre, email, rol
+        FROM Usuarios_RI 
+        WHERE rol IN ('aprobador', 'admin')
+          AND activo = true
+        ORDER BY nombre ASC
+      `;
+
       const result = await pool.query(query);
+      
+      console.log(`✅ Obtenidos ${result.rows.length} aprobadores`);
       return result.rows;
       
     } catch (error) {
-      throw error;
+      console.error('Error en getApprovers:', error);
+      throw new Error(`Error al obtener aprobadores: ${error.message}`);
+    }
+  }
+
+  // ==================== LIMPIAR TOKENS EXPIRADOS ====================
+  static async cleanExpiredTokens() {
+    try {
+      const query = `
+        UPDATE Usuarios_RI 
+        SET reset_password_token = NULL,
+            reset_password_expires = NULL
+        WHERE reset_password_expires < NOW()
+          AND reset_password_token IS NOT NULL
+      `;
+
+      const result = await pool.query(query);
+      
+      if (result.rowCount > 0) {
+        console.log(`🧹 Limpiados ${result.rowCount} tokens expirados`);
+      }
+      
+      return result.rowCount;
+      
+    } catch (error) {
+      console.error('Error en cleanExpiredTokens:', error);
+      throw new Error(`Error al limpiar tokens: ${error.message}`);
     }
   }
 }
 
 module.exports = User;
-
-

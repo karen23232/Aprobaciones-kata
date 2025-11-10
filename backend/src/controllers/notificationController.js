@@ -2,7 +2,7 @@ const Notification = require('../models/Notification');
 
 exports.getNotifications = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const { limit } = req.query;
     
     const notifications = await Notification.getByUser(userId, parseInt(limit) || 10);
@@ -24,7 +24,7 @@ exports.getNotifications = async (req, res) => {
 exports.markAsRead = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     
     await Notification.markAsRead(id, userId);
     
@@ -44,7 +44,7 @@ exports.markAsRead = async (req, res) => {
 
 exports.markAllAsRead = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     
     await Notification.markAllAsRead(userId);
     
@@ -64,7 +64,7 @@ exports.markAllAsRead = async (req, res) => {
 
 exports.getUnreadCount = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     
     const count = await Notification.getUnreadCount(userId);
     

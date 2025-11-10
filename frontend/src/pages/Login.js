@@ -55,7 +55,7 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
 
@@ -82,7 +82,6 @@ const Login = () => {
         });
         setErrors(newErrors);
       } else {
-        // Mensajes de error más específicos
         let errorMessage = 'Error al iniciar sesión. Por favor intenta de nuevo.';
         
         if (error.message?.includes('Credenciales inválidas')) {
@@ -120,7 +119,6 @@ const Login = () => {
             <label htmlFor="email" className="form-label">
               Correo Electrónico
             </label>
-
             <input
               type="email"
               id="email"
@@ -138,9 +136,6 @@ const Login = () => {
             <label htmlFor="password" className="form-label">
               Contraseña
             </label>
-            <div className="form-group">
-            <label htmlFor="password" className="form-label">
-            </label>
             <PasswordInput
               value={formData.password}
               onChange={handleChange}
@@ -148,15 +143,13 @@ const Login = () => {
               name="password"
               error={errors.password}
             />
+            
+            {/* Enlace de recuperación de contraseña */}
             <div className="forgot-password">
-              <a href="#" onClick={(e) => {
-                e.preventDefault();
-                alert('Funcionalidad de recuperación de contraseña en desarrollo. Por favor contacta al administrador.');
-              }}>
+              <Link to="/forgot-password">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </div>
-          </div>
           </div>
 
           <button

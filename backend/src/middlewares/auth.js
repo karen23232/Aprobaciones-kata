@@ -17,8 +17,10 @@ exports.protect = (req, res, next) => {
     // Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Agregar userId al request
-    req.userId = decoded.id;
+    // ✅ CORRECCIÓN: Guardar como req.user (objeto completo)
+    req.user = {
+      id: decoded.id
+    };
     
     next();
   } catch (error) {
@@ -31,9 +33,16 @@ exports.protect = (req, res, next) => {
       });
     }
     
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token inválido'
+      });
+    }
+    
     res.status(401).json({
       success: false,
-      message: 'Token inválido'
+      message: 'Error de autenticación'
     });
   }
 };

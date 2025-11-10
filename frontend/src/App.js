@@ -9,6 +9,8 @@ import RequestsList from './pages/RequestsList';
 import CreateRequest from './pages/CreateRequest';
 import RequestDetail from './pages/RequestDetail';
 import './styles/global.css';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password" element={<ResetPassword />} />
           
           <Route
             path="/dashboard"

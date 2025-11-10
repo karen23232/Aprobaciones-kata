@@ -7,7 +7,7 @@ const Notification = require('../models/Notification');
 exports.createRequest = async (req, res) => {
   try {
     const { titulo, descripcion, tipo_solicitud_id, responsable_id } = req.body;
-    const solicitante_id = req.userId;
+    const solicitante_id = req.user.id; // ✅ CORREGIDO
     
     // Validar que el responsable exista y sea aprobador
     const responsable = await User.findById(responsable_id);
@@ -83,8 +83,15 @@ exports.createRequest = async (req, res) => {
 // Obtener solicitudes
 exports.getRequests = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
     
     const { estado, limit, offset } = req.query;
     
@@ -114,8 +121,15 @@ exports.getRequests = async (req, res) => {
 exports.getRequestById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
     
     const solicitud = await Request.getById(id);
     
@@ -163,8 +177,15 @@ exports.updateRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { titulo, descripcion, tipo_solicitud_id, responsable_id } = req.body;
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
     
     const solicitud = await Request.getById(id);
     
@@ -241,8 +262,15 @@ exports.updateRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { estado, comentario } = req.body;
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
     
     const solicitud = await Request.getById(id);
     
@@ -329,8 +357,15 @@ exports.updateRequestStatus = async (req, res) => {
 // Obtener estadísticas
 exports.getStats = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id; // ✅ CORREGIDO
     const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
     
     const stats = await Request.getStats(userId, user.rol);
     
