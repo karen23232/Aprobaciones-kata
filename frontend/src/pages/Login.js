@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { validateEmail } from '../utils/validation';
 import '../styles/Auth.css';
 
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();

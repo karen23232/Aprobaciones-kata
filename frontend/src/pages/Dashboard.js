@@ -24,10 +24,21 @@ const Dashboard = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showStats, setShowStats] = useState(false); // 📊 Nuevo estado para mostrar/ocultar stats
+  const [showStats, setShowStats] = useState(false);
 
+  // 🔔 POLLING: Cargar datos iniciales y configurar actualización automática
   useEffect(() => {
     loadDashboardData();
+    
+    // 🔔 Refrescar notificaciones cada 30 segundos
+    const notificationInterval = setInterval(() => {
+      refreshNotifications();
+    }, 30000); // 30 segundos
+    
+    // Limpiar intervalo al desmontar el componente
+    return () => {
+      clearInterval(notificationInterval);
+    };
   }, []);
 
   const loadDashboardData = async () => {
@@ -49,6 +60,25 @@ const Dashboard = () => {
       console.error('Error al cargar dashboard:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔔 NUEVA FUNCIÓN: Refrescar solo notificaciones (más eficiente)
+  const refreshNotifications = async () => {
+    try {
+      const [notificationsData, countData] = await Promise.all([
+        notificationService.getAll(5),
+        notificationService.getUnreadCount(),
+      ]);
+      
+      setNotifications(notificationsData.data);
+      setUnreadCount(countData.data.count);
+      
+      // Log opcional para verificar que está funcionando (puedes quitarlo después)
+      console.log('🔔 Notificaciones actualizadas:', countData.data.count, 'sin leer');
+    } catch (error) {
+      console.error('Error al refrescar notificaciones:', error);
+      // No mostrar error al usuario, solo registrar en consola
     }
   };
 
@@ -255,8 +285,6 @@ const Dashboard = () => {
               onClick={() => navigate('/requests/new')}
             >
               <div className="action-card-image">
-                {/* Aquí puedes colocar una imagen */}
-                {/* <img src="/assets/images/nueva-solicitud.jpg" alt="Nueva Solicitud" /> */}
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -274,7 +302,6 @@ const Dashboard = () => {
               onClick={() => navigate('/requests')}
             >
               <div className="action-card-image">
-                {/* <img src="/assets/images/ver-todas.jpg" alt="Ver Todas" /> */}
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
@@ -296,7 +323,6 @@ const Dashboard = () => {
                 onClick={() => navigate('/requests?estado=pendiente')}
               >
                 <div className="action-card-image">
-                  {/* <img src="/assets/images/pendientes.jpg" alt="Pendientes" /> */}
                   <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>

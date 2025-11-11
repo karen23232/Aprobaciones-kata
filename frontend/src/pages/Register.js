@@ -17,7 +17,7 @@ const Register = () => {
     confirmPassword: '',
     rol: 'solicitante',
   });
-
+a
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');

@@ -42,11 +42,11 @@ exports.createRequest = async (req, res) => {
       responsable_id
     });
     
-    // 🔔 CREAR NOTIFICACIONES PARA AMBOS USUARIOS
+    // 🔔 CREAR NOTIFICACIONES PARA TODOS LOS INVOLUCRADOS
     try {
       const solicitante = await User.findById(solicitante_id);
       
-      // Notificación para el RESPONSABLE (para que apruebe)
+      // 1️⃣ Notificación para el RESPONSABLE (aprobador asignado)
       await Notification.create({
         usuario_id: responsable_id,
         solicitud_id: solicitud.id,
@@ -54,13 +54,29 @@ exports.createRequest = async (req, res) => {
         mensaje: `${solicitante.nombre} ha creado una nueva solicitud: "${titulo}" que requiere tu aprobación`
       });
       
-      // Notificación para el SOLICITANTE (confirmación de envío)
+      // 2️⃣ Notificación para el SOLICITANTE (confirmación de envío)
       await Notification.create({
         usuario_id: solicitante_id,
         solicitud_id: solicitud.id,
         tipo: 'pendiente',
         mensaje: `Tu solicitud "${titulo}" ha sido enviada y está pendiente de aprobación`
       });
+      
+      // 3️⃣ Notificación para TODOS LOS ADMINISTRADORES
+      const admins = await User.getAdmins(); // Obtener todos los admins
+      
+      for (const admin of admins) {
+        // No enviar notificación al admin si él mismo es el responsable
+        if (admin.id !== responsable_id) {
+          await Notification.create({
+            usuario_id: admin.id,
+            solicitud_id: solicitud.id,
+            tipo: 'pendiente',
+            mensaje: `Nueva solicitud creada por ${solicitante.nombre}: "${titulo}" - Asignada a ${responsable.nombre}`
+          });
+        }
+      }
+      
     } catch (notifError) {
       console.error('Error al crear notificaciones:', notifError);
     }
@@ -312,7 +328,7 @@ exports.updateRequestStatus = async (req, res) => {
       usuario_id: userId
     });
     
-    // 🔔 CREAR NOTIFICACIÓN PARA EL SOLICITANTE
+    // 🔔 CREAR NOTIFICACIONES PARA TODOS
     try {
       let mensaje = '';
       let tipo = estado;
@@ -329,12 +345,29 @@ exports.updateRequestStatus = async (req, res) => {
         }
       }
       
+      // 1️⃣ Notificación para el SOLICITANTE
       await Notification.create({
         usuario_id: solicitud.solicitante_id,
         solicitud_id: solicitud.id,
         tipo: tipo,
         mensaje: mensaje
       });
+      
+      // 2️⃣ Notificaciones para TODOS LOS ADMINISTRADORES
+      const admins = await User.getAdmins();
+      
+      for (const admin of admins) {
+        // No enviar notificación al admin que aprobó/rechazó
+        if (admin.id !== userId) {
+          await Notification.create({
+            usuario_id: admin.id,
+            solicitud_id: solicitud.id,
+            tipo: tipo,
+            mensaje: `La solicitud "${solicitud.titulo}" ha sido ${estado} por ${user.nombre}`
+          });
+        }
+      }
+      
     } catch (notifError) {
       console.error('Error al crear notificación:', notifError);
     }
