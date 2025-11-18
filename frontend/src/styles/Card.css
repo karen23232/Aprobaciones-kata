@@ -1,14 +1,27 @@
+/* ========================================
+   🎴 CARD COMPONENT - CON MODO OSCURO
+   ======================================== */
+
 .card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 .card-hover:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
+}
+
+[data-theme="dark"] .card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .card-hover:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {

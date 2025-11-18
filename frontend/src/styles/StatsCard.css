@@ -1,15 +1,27 @@
+/* ========================================
+   📊 STATS CARD - CON MODO OSCURO
+   ======================================== */
+
 .stats-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     transition: all 0.3s ease;
     border-left: 4px solid;
 }
 
 .stats-card:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
+}
+
+[data-theme="dark"] .stats-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .stats-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 .stats-card-primary {
@@ -42,10 +54,11 @@
 
 .stats-card-title {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 .stats-card-icon {
@@ -56,7 +69,8 @@
 .stats-card-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .stats-card-trend {

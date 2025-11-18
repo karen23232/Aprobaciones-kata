@@ -1,3 +1,7 @@
+/* ========================================
+   🏷️ BADGE COMPONENT - CON MODO OSCURO
+   ======================================== */
+
 .badge {
     display: inline-flex;
     align-items: center;
@@ -7,6 +11,7 @@
     font-weight: 600;
     border-radius: 12px;
     white-space: nowrap;
+    transition: all 0.3s ease;
 }
 
 .badge-small {
@@ -24,32 +29,68 @@
     font-size: 0.875rem;
 }
 
+/* Default */
 .badge-default {
     background-color: #e5e7eb;
     color: #374151;
 }
 
+[data-theme="dark"] .badge-default {
+    background-color: #374151;
+    color: #e5e7eb;
+}
+
+/* Success */
 .badge-success {
     background-color: #d1fae5;
     color: #065f46;
 }
 
+[data-theme="dark"] .badge-success {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+
+/* Warning */
 .badge-warning {
     background-color: #fef3c7;
     color: #92400e;
 }
 
+[data-theme="dark"] .badge-warning {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+/* Danger */
 .badge-danger {
     background-color: #fee2e2;
     color: #991b1b;
 }
 
+[data-theme="dark"] .badge-danger {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+/* Info */
 .badge-info {
     background-color: #dbeafe;
     color: #1e40af;
 }
 
+[data-theme="dark"] .badge-info {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+
+/* Primary */
 .badge-primary {
     background-color: #e0e7ff;
     color: #3730a3;
+}
+
+[data-theme="dark"] .badge-primary {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
 }

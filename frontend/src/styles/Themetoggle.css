@@ -1,30 +1,68 @@
+/* ========================================
+   🌙 THEME TOGGLE BUTTON
+   ======================================== */
+
 .theme-toggle {
-    background: transparent;
-    border: none;
+    position: relative;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     cursor: pointer;
-    padding: 10px;
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 8px;
     transition: all 0.3s ease;
-    color: var(--text-primary);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
 }
 
 .theme-toggle:hover {
-    background: var(--hover-bg);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 209, 0, 0.3);
+}
+
+.theme-toggle:active {
+    transform: translateY(0) scale(0.95);
 }
 
 .theme-toggle svg {
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .theme-toggle:hover svg {
-    transform: rotate(20deg);
+    transform: rotate(20deg) scale(1.1);
 }
 
-/* Animación suave al cambiar de tema */
-.theme-toggle:active {
-    transform: scale(0.95);
+/* Modo oscuro - ajustar colores del botón */
+[data-theme="dark"] .theme-toggle {
+    background: rgba(255, 209, 0, 0.1);
+    border-color: rgba(255, 209, 0, 0.3);
+    color: #ffd100;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(255, 209, 0, 0.2);
+    border-color: rgba(255, 209, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(255, 209, 0, 0.4);
+}
+
+/* Animación de cambio de tema */
+@keyframes themeTransition {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.theme-toggle.transitioning {
+    animation: themeTransition 0.3s ease;
 }

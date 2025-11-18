@@ -1,5 +1,5 @@
 /* ========================================
-   REQUESTS LIST - BANCO DE BOGOTÁ
+   📋 REQUESTS LIST - CON MODO OSCURO
    ======================================== */
 
 .requests-page {
@@ -10,10 +10,20 @@
         rgba(255, 209, 0, 0.03) 50%,
         rgba(0, 61, 165, 0.03) 100%
     );
+    transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .requests-page {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 61, 165, 0.05) 0%,
+        rgba(255, 209, 0, 0.05) 50%,
+        rgba(0, 61, 165, 0.05) 100%
+    );
 }
 
 /* ========================================
-   HEADER - COLORES BANCO DE BOGOTÁ
+   HEADER
    ======================================== */
 .page-header {
     background: linear-gradient(135deg, #003da5 0%, #002875 100%);
@@ -23,6 +33,12 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .page-header {
+    background: linear-gradient(135deg, #001d4a 0%, #001233 100%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 }
 
 .page-header .header-content {
@@ -34,7 +50,6 @@
     gap: 1.5rem;
 }
 
-/* Logo del Banco */
 .bank-logo {
     width: 50px;
     height: 50px;
@@ -49,7 +64,6 @@
     color: #ffffff;
 }
 
-/* Botón Volver */
 .back-btn {
     display: flex;
     align-items: center;
@@ -74,7 +88,6 @@
     box-shadow: 0 4px 12px rgba(255, 209, 0, 0.4);
 }
 
-/* Botón Nueva Solicitud */
 .btn-primary {
     background: linear-gradient(135deg, #ffd100 0%, #ffb800 100%);
     color: #003da5;
@@ -125,6 +138,16 @@
     padding: 0.375rem;
     border-radius: 10px;
     border: 2px solid #003da5;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .filter-tabs {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 61, 165, 0.2) 0%,
+        rgba(0, 81, 213, 0.2) 100%
+    );
+    border-color: #0051d5;
 }
 
 .filter-tab {
@@ -139,9 +162,18 @@
     font-size: 0.875rem;
 }
 
+[data-theme="dark"] .filter-tab {
+    color: #93c5fd;
+}
+
 .filter-tab:hover {
     background: rgba(0, 61, 165, 0.1);
     color: #002875;
+}
+
+[data-theme="dark"] .filter-tab:hover {
+    background: rgba(147, 197, 253, 0.1);
+    color: #dbeafe;
 }
 
 .filter-tab.active {
@@ -150,12 +182,16 @@
     box-shadow: 0 2px 8px rgba(0, 61, 165, 0.3);
 }
 
+[data-theme="dark"] .filter-tab.active {
+    background: linear-gradient(135deg, #0051d5 0%, #0066ff 100%);
+}
+
 .search-box {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #ffffff;
-    border: 2px solid #003da5;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
     padding: 0.75rem 1rem;
     border-radius: 8px;
     min-width: 300px;
@@ -163,14 +199,22 @@
 }
 
 .search-box:focus-within {
-    border-color: #002875;
-    background: #ffffff;
+    border-color: #003da5;
     box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+}
+
+[data-theme="dark"] .search-box:focus-within {
+    border-color: #0051d5;
+    box-shadow: 0 0 0 3px rgba(0, 81, 213, 0.2);
 }
 
 .search-box svg {
     color: #003da5;
     flex-shrink: 0;
+}
+
+[data-theme="dark"] .search-box svg {
+    color: #93c5fd;
 }
 
 .search-box input {
@@ -179,11 +223,11 @@
     outline: none;
     flex: 1;
     font-size: 0.938rem;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .search-box input::placeholder {
-    color: #9ca3af;
+    color: var(--text-tertiary);
 }
 
 /* ========================================
@@ -209,18 +253,22 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-color);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: #ffffff;
+    background: var(--card-bg);
 }
 
 .request-row:hover {
     border-color: #003da5;
     box-shadow: 0 4px 12px rgba(0, 61, 165, 0.15);
     transform: translateX(4px);
-    background: linear-gradient(to right, #ffffff 0%, #f8f9ff 100%);
+}
+
+[data-theme="dark"] .request-row:hover {
+    border-color: #0051d5;
+    box-shadow: 0 4px 12px rgba(0, 81, 213, 0.3);
 }
 
 .request-info {
@@ -239,11 +287,11 @@
 .request-title-table {
     font-size: 1rem;
     font-weight: 600;
-    color: #003da5;
+    color: var(--text-primary);
     margin: 0;
+    transition: color 0.3s ease;
 }
 
-/* CÓDIGO ÚNICO - COLORES BANCO DE BOGOTÁ */
 .request-code-table {
     display: inline-block;
     font-size: 0.813rem;
@@ -256,6 +304,17 @@
     letter-spacing: 0.5px;
     border: 2px solid #003da5;
     box-shadow: 0 2px 4px rgba(0, 61, 165, 0.1);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .request-code-table {
+    color: #ffd100;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 209, 0, 0.1) 0%,
+        rgba(255, 184, 0, 0.1) 100%
+    );
+    border-color: #ffd100;
 }
 
 .request-meta-info {
@@ -263,8 +322,9 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     flex-wrap: wrap;
+    transition: color 0.3s ease;
 }
 
 .request-type-table {
@@ -272,16 +332,20 @@
     color: #003da5;
 }
 
+[data-theme="dark"] .request-type-table {
+    color: #93c5fd;
+}
+
 .request-separator {
-    color: #d1d5db;
+    color: var(--text-tertiary);
 }
 
 .request-user {
-    color: #4b5563;
+    color: var(--text-secondary);
 }
 
 .request-date {
-    color: #9ca3af;
+    color: var(--text-tertiary);
 }
 
 .request-status {

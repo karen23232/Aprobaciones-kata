@@ -1,5 +1,5 @@
 /* ========================================
-   REQUEST DETAIL - BANCO DE BOGOTÁ
+   📄 REQUEST DETAIL - CON MODO OSCURO
    ======================================== */
 
 .request-detail-page {
@@ -10,10 +10,20 @@
         rgba(255, 209, 0, 0.03) 50%,
         rgba(0, 61, 165, 0.03) 100%
     );
+    transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .request-detail-page {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 61, 165, 0.05) 0%,
+        rgba(255, 209, 0, 0.05) 50%,
+        rgba(0, 61, 165, 0.05) 100%
+    );
 }
 
 /* ========================================
-   HEADER - COLORES BANCO DE BOGOTÁ
+   HEADER
    ======================================== */
 .page-header {
     background: linear-gradient(135deg, #003da5 0%, #002875 100%);
@@ -23,6 +33,12 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .page-header {
+    background: linear-gradient(135deg, #001d4a 0%, #001233 100%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 }
 
 .page-header .header-content {
@@ -34,7 +50,6 @@
     gap: 1.5rem;
 }
 
-/* Logo del Banco */
 .bank-logo {
     width: 50px;
     height: 50px;
@@ -49,7 +64,6 @@
     color: #ffffff;
 }
 
-/* Botón Volver */
 .back-btn {
     display: flex;
     align-items: center;
@@ -114,6 +128,12 @@
     animation: slideDown 0.3s ease-out;
 }
 
+[data-theme="dark"] .alert-success {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border-color: #10b981;
+}
+
 .alert-error {
     display: flex;
     align-items: center;
@@ -127,6 +147,12 @@
     color: #991b1b;
     border: 2px solid #ef4444;
     animation: slideDown 0.3s ease-out;
+}
+
+[data-theme="dark"] .alert-error {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border-color: #ef4444;
 }
 
 @keyframes slideDown {
@@ -153,16 +179,21 @@
     gap: 1.5rem;
 }
 
+[data-theme="dark"] .request-header-detail {
+    border-bottom-color: #0051d5;
+}
+
 .header-title-section {
     flex: 1;
 }
 
 .header-title-section h2 {
     font-size: 1.75rem;
-    color: #003da5;
+    color: var(--text-primary);
     margin: 0 0 0.5rem 0;
     font-weight: 700;
     line-height: 1.3;
+    transition: color 0.3s ease;
 }
 
 .request-code-detail {
@@ -176,6 +207,17 @@
     border: 2px solid #003da5;
     display: inline-block;
     box-shadow: 0 2px 4px rgba(0, 61, 165, 0.1);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .request-code-detail {
+    color: #ffd100;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 209, 0, 0.1) 0%,
+        rgba(255, 184, 0, 0.1) 100%
+    );
+    border-color: #ffd100;
 }
 
 /* ========================================
@@ -184,18 +226,20 @@
 .section-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #003da5;
+    color: var(--text-primary);
     margin: 0 0 1rem 0;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e8f0ff;
+    border-bottom: 2px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
 .request-description {
-    color: #4b5563;
+    color: var(--text-secondary);
     line-height: 1.7;
     white-space: pre-wrap;
     margin: 0;
     font-size: 0.938rem;
+    transition: color 0.3s ease;
 }
 
 /* ========================================
@@ -207,7 +251,7 @@
     gap: 1rem;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 2px solid #e5e7eb;
+    border-top: 2px solid var(--border-color);
 }
 
 .approval-buttons {
@@ -217,7 +261,7 @@
 }
 
 /* ========================================
-   BUTTONS - BANCO DE BOGOTÁ
+   BUTTONS
    ======================================== */
 .btn {
     padding: 0.75rem 1.5rem;
@@ -251,16 +295,27 @@
 }
 
 .btn-secondary {
-    background: #ffffff;
+    background: var(--card-bg);
     color: #003da5;
     border: 2px solid #003da5;
 }
 
+[data-theme="dark"] .btn-secondary {
+    color: #93c5fd;
+    border-color: #0051d5;
+}
+
 .btn-secondary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #e8f0ff 0%, #d0e2ff 100%);
+    background: rgba(0, 61, 165, 0.1);
     border-color: #002875;
     color: #002875;
     transform: translateY(-2px);
+}
+
+[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+    background: rgba(0, 81, 213, 0.2);
+    border-color: #0066ff;
+    color: #dbeafe;
 }
 
 .btn-success {
@@ -288,7 +343,7 @@
 }
 
 /* ========================================
-   SIDEBAR DE INFORMACIÓN
+   SIDEBAR
    ======================================== */
 .detail-sidebar {
     display: flex;
@@ -307,7 +362,7 @@
     flex-direction: column;
     gap: 0.375rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #e8f0ff;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .info-item:last-child {
@@ -317,27 +372,30 @@
 
 .info-label {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 .info-value {
     font-size: 0.938rem;
-    color: #003da5;
+    color: var(--text-primary);
     word-break: break-word;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .info-detail {
     font-size: 0.813rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-top: 0.125rem;
+    transition: color 0.3s ease;
 }
 
 /* ========================================
-   HISTORIAL DE CAMBIOS
+   HISTORIAL
    ======================================== */
 .history-timeline {
     display: flex;
@@ -349,10 +407,15 @@
     display: flex;
     gap: 1rem;
     padding: 1.25rem;
-    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    background: var(--card-bg);
     border-radius: 10px;
     border-left: 4px solid #003da5;
-    box-shadow: 0 2px 6px rgba(0, 61, 165, 0.08);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .history-item {
+    border-left-color: #0051d5;
 }
 
 .history-icon {
@@ -387,38 +450,38 @@
 
 .history-time {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-tertiary);
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .history-user {
     font-size: 0.875rem;
-    color: #003da5;
+    color: var(--text-primary);
     margin: 0.25rem 0;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .history-comment {
     font-size: 0.875rem;
-    color: #4b5563;
+    color: var(--text-secondary);
     margin: 0.75rem 0 0 0;
     font-style: italic;
     padding: 0.75rem;
-    background: #ffffff;
+    background: var(--bg-tertiary);
     border-radius: 6px;
     border-left: 3px solid #ffd100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
 }
 
 .history-comment strong {
-    color: #003da5;
+    color: var(--text-primary);
     font-style: normal;
     font-weight: 700;
 }
 
-/* ========================================
-   HISTORIAL DETALLADO - NUEVOS ESTILOS
-   ======================================== */
 .history-changes {
     margin-top: 0.75rem;
 }
@@ -434,14 +497,19 @@
 
 .change-item {
     font-size: 0.813rem;
-    color: #003da5;
-    background: linear-gradient(135deg, #f0f8ff 0%, #e8f0ff 100%);
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
     border-left: 3px solid #003da5;
     font-weight: 500;
     position: relative;
     padding-left: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .change-item {
+    border-left-color: #0051d5;
 }
 
 .change-item::before {
@@ -450,6 +518,10 @@
     left: 0.75rem;
     color: #003da5;
     font-weight: 700;
+}
+
+[data-theme="dark"] .change-item::before {
+    color: #93c5fd;
 }
 
 /* ========================================
@@ -482,6 +554,11 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: #003da5;
+    transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .form-label {
+    color: #93c5fd;
 }
 
 .required {
@@ -493,12 +570,13 @@
 .form-textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.938rem;
     transition: all 0.2s ease;
     font-family: inherit;
-    background-color: #ffffff;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .form-input:focus,
@@ -507,6 +585,13 @@
     outline: none;
     border-color: #003da5;
     box-shadow: 0 0 0 3px rgba(0, 61, 165, 0.1);
+}
+
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] .form-textarea:focus {
+    border-color: #0051d5;
+    box-shadow: 0 0 0 3px rgba(0, 81, 213, 0.2);
 }
 
 .form-textarea {
@@ -524,8 +609,9 @@
 
 .error-state p {
     font-size: 1.125rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
 }
 
 /* ========================================
