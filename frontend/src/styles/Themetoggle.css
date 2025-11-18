@@ -1,0 +1,30 @@
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+    background: var(--hover-bg);
+    transform: scale(1.1);
+}
+
+.theme-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+    transform: rotate(20deg);
+}
+
+/* Animación suave al cambiar de tema */
+.theme-toggle:active {
+    transform: scale(0.95);
+}

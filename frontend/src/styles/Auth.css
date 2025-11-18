@@ -57,13 +57,12 @@
 
 .auth-logo {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .auth-logo img {
-    width: 120px; /* Tamaño más pequeño */
+    width: 60px;
     height: auto;
-    margin-bottom: 10px;
     object-fit: contain;
 }
 
@@ -332,7 +331,7 @@
     }
 
     .auth-logo img {
-        width: 100px; /* Más pequeño en móvil */
+        width: 50px;
     }
 }
 

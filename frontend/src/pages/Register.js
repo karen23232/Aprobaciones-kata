@@ -17,7 +17,7 @@ const Register = () => {
     confirmPassword: '',
     rol: 'solicitante',
   });
-a
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -116,6 +116,9 @@ a
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <div className="auth-logo">
+          <img src="/assets/images/Logo.png" alt="Logo" />
+        </div>
         <div className="auth-header">
           <h1 className="auth-title">Crear Cuenta</h1>
           <p className="auth-subtitle">Completa el formulario para registrarte</p>

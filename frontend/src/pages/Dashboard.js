@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import Badge from '../components/Badge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import ThemeToggle from '../components/ThemeToggle';
 import { formatRelativeTime, getStatusColor, getStatusIcon } from '../utils/formatters';
 import '../styles/Dashboard.css';
 
@@ -153,6 +154,9 @@ const Dashboard = () => {
           </div>
           
           <div className="header-right">
+            {/* 🌙 BOTÓN DE TEMA - NUEVO */}
+            <ThemeToggle />
+
             {/* Notificaciones */}
             <div className="notifications-wrapper">
               <button
