@@ -255,25 +255,21 @@ const Dashboard = () => {
             <StatsCard
               title="Total Solicitudes"
               value={stats?.total || 0}
-              icon="📊"
               color="primary"
             />
             <StatsCard
               title="Pendientes"
               value={stats?.pendientes || 0}
-              icon="⏳"
               color="warning"
             />
             <StatsCard
               title="Aprobadas"
               value={stats?.aprobadas || 0}
-              icon="✅"
               color="success"
             />
             <StatsCard
               title="Rechazadas"
               value={stats?.rechazadas || 0}
-              icon="❌"
               color="danger"
             />
           </div>
