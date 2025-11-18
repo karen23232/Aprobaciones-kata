@@ -193,19 +193,21 @@ const RequestDetail = () => {
     }
   };
 
-  // 🆕 FUNCIÓN PARA MOSTRAR DETALLES DE CAMBIOS
+  // 🆕 FUNCIÓN MEJORADA PARA MOSTRAR DETALLES DE CAMBIOS
   const renderHistoryDetails = (item) => {
     if (item.accion === 'editar' && item.comentario) {
-      // Si el comentario tiene el formato detallado de cambios
-      if (item.comentario.includes('Solicitud editada:')) {
-        const detalles = item.comentario.replace('Solicitud editada: ', '');
+      // Si el comentario tiene el formato "Solicitud editada: cambio1, cambio2..."
+      if (item.comentario.startsWith('Solicitud editada:')) {
+        const detallesCompletos = item.comentario.replace('Solicitud editada: ', '');
+        const cambios = detallesCompletos.split(', ');
+        
         return (
           <div className="history-changes">
             <p className="history-comment">
               <strong>Cambios realizados:</strong>
             </p>
             <ul className="changes-list">
-              {detalles.split(', ').map((cambio, index) => (
+              {cambios.map((cambio, index) => (
                 <li key={index} className="change-item">
                   {cambio}
                 </li>
@@ -214,9 +216,27 @@ const RequestDetail = () => {
           </div>
         );
       }
+      
+      // Si es un comentario simple de edición
+      if (item.comentario === 'Solicitud editada' || item.comentario === 'Solicitud editada sin cambios') {
+        return (
+          <p className="history-comment">
+            <strong>Solicitud editada</strong>
+          </p>
+        );
+      }
     }
     
-    // Para otros comentarios normales
+    // Para comentarios de aprobación/rechazo
+    if (item.comentario && (item.accion === 'aprobado' || item.accion === 'rechazado')) {
+      return (
+        <p className="history-comment">
+          <strong>Comentario:</strong> {item.comentario}
+        </p>
+      );
+    }
+    
+    // Para cualquier otro comentario
     if (item.comentario) {
       return (
         <p className="history-comment">{item.comentario}</p>
@@ -362,10 +382,10 @@ const RequestDetail = () => {
                     {history.map((item, index) => (
                       <div key={item.id} className="history-item">
                         <div className="history-icon">
-                          {item.accion === 'crear' && '📝'}
-                          {item.accion === 'editar' && '✏️'}
-                          {item.accion === 'aprobado' && '✅'}
-                          {item.accion === 'rechazado' && '❌'}
+                          {item.accion === 'crear' && ''}
+                          {item.accion === 'editar' && ''}
+                          {item.accion === 'aprobado' && ''}
+                          {item.accion === 'rechazado' && ''}
                         </div>
                         <div className="history-content">
                           <div className="history-header">
@@ -426,7 +446,7 @@ const RequestDetail = () => {
         <Modal
           isOpen={showActionModal}
           onClose={handleCloseActionModal}
-          title={modalAction === 'aprobado' ? '✅ Aprobar Solicitud' : '❌ Rechazar Solicitud'}
+          title={modalAction === 'aprobado' ? '✅ Aprobar Solicitud' : 'Rechazar Solicitud'}
           size="medium"
         >
           <div className="modal-form">
@@ -479,7 +499,7 @@ const RequestDetail = () => {
         <Modal
           isOpen={showEditModal}
           onClose={handleCloseEditModal}
-          title="✏️ Editar Solicitud"
+          title="Editar Solicitud"
           size="large"
         >
           <form onSubmit={handleSubmitEdit} className="modal-form">

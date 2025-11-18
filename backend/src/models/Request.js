@@ -239,55 +239,100 @@ class Request {
       client.release();
     }
   }
-  // Agregar este método a la clase Request en backend/src/models/Request.js
 
-// Actualizar solicitud (editar)
-// Agregar este método dentro de la clase Request en backend/src/models/Request.js
-// Colócalo después del método create() y antes de getAll()
-
-// Actualizar solicitud (editar)
-static async update(id, { titulo, descripcion, tipo_solicitud_id, responsable_id, usuario_id }) {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    
-    // Actualizar solicitud
-    const updateQuery = `
-      UPDATE Solicitudes 
-      SET titulo = $1, 
-          descripcion = $2, 
-          tipo_solicitud_id = $3, 
-          responsable_id = $4,
-          updated_at = NOW()
-      WHERE id = $5
-      RETURNING *
-    `;
-    
-    const result = await client.query(updateQuery, [
-      titulo, descripcion, tipo_solicitud_id, responsable_id, id
-    ]);
-    
-    // Registrar en historial
-    const historialQuery = `
-      INSERT INTO Historial_Solicitudes 
-      (solicitud_id, usuario_id, accion, estado_anterior, estado_nuevo, comentario)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `;
-    
-    await client.query(historialQuery, [
-      id, usuario_id, 'editar', 'pendiente', 'pendiente', 'Solicitud editada'
-    ]);
-    
-    await client.query('COMMIT');
-    return result.rows[0];
-    
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
+  // 📝 ACTUALIZAR SOLICITUD CON TRACKING DETALLADO DE CAMBIOS
+  static async update(id, { titulo, descripcion, tipo_solicitud_id, responsable_id, usuario_id }) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      // 🔍 OBTENER DATOS ANTERIORES PARA COMPARAR
+      const oldDataQuery = `
+        SELECT 
+          s.*,
+          ts.nombre as tipo_nombre_anterior,
+          u.nombre as responsable_nombre_anterior
+        FROM Solicitudes s
+        LEFT JOIN Tipos_Solicitud ts ON s.tipo_solicitud_id = ts.id
+        LEFT JOIN Usuarios_RI u ON s.responsable_id = u.id
+        WHERE s.id = $1
+      `;
+      const oldDataResult = await client.query(oldDataQuery, [id]);
+      const oldData = oldDataResult.rows[0];
+      
+      if (!oldData) {
+        throw new Error('Solicitud no encontrada');
+      }
+      
+      // 🔍 OBTENER NOMBRES DE LOS NUEVOS VALORES
+      const newTypeQuery = `SELECT nombre FROM Tipos_Solicitud WHERE id = $1`;
+      const newTypeResult = await client.query(newTypeQuery, [tipo_solicitud_id]);
+      const newTypeName = newTypeResult.rows[0]?.nombre;
+      
+      const newResponsableQuery = `SELECT nombre FROM Usuarios_RI WHERE id = $1`;
+      const newResponsableResult = await client.query(newResponsableQuery, [responsable_id]);
+      const newResponsableName = newResponsableResult.rows[0]?.nombre;
+      
+      // 📝 DETECTAR QUÉ CAMBIÓ
+      const cambios = [];
+      
+      if (oldData.titulo !== titulo) {
+        cambios.push(`Título: "${oldData.titulo}" → "${titulo}"`);
+      }
+      
+      if (oldData.tipo_solicitud_id !== tipo_solicitud_id) {
+        cambios.push(`Tipo: "${oldData.tipo_nombre_anterior}" → "${newTypeName}"`);
+      }
+      
+      if (oldData.responsable_id !== responsable_id) {
+        cambios.push(`Responsable: "${oldData.responsable_nombre_anterior}" → "${newResponsableName}"`);
+      }
+      
+      if (oldData.descripcion !== descripcion) {
+        cambios.push(`Descripción: modificada`);
+      }
+      
+      // Actualizar solicitud
+      const updateQuery = `
+        UPDATE Solicitudes 
+        SET titulo = $1, 
+            descripcion = $2, 
+            tipo_solicitud_id = $3, 
+            responsable_id = $4,
+            updated_at = NOW()
+        WHERE id = $5
+        RETURNING *
+      `;
+      
+      const result = await client.query(updateQuery, [
+        titulo, descripcion, tipo_solicitud_id, responsable_id, id
+      ]);
+      
+      // 💾 REGISTRAR EN HISTORIAL CON CAMBIOS DETALLADOS
+      const comentarioDetallado = cambios.length > 0 
+        ? `Solicitud editada: ${cambios.join(', ')}`
+        : 'Solicitud editada sin cambios';
+      
+      const historialQuery = `
+        INSERT INTO Historial_Solicitudes 
+        (solicitud_id, usuario_id, accion, estado_anterior, estado_nuevo, comentario)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `;
+      
+      await client.query(historialQuery, [
+        id, usuario_id, 'editar', 'pendiente', 'pendiente', comentarioDetallado
+      ]);
+      
+      await client.query('COMMIT');
+      return result.rows[0];
+      
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
-}
   
   // Obtener historial de una solicitud
   static async getHistory(solicitudId) {
