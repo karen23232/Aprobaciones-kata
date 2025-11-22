@@ -1,8 +1,12 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Normalizamos la URL por si Railway la envía como "postgresql://"
+const rawConnectionString = process.env.DATABASE_URL;
+const normalizedConnectionString = rawConnectionString.replace('postgresql://', 'postgres://');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: normalizedConnectionString,
   ssl: {
     rejectUnauthorized: false, // Requerido por Railway
   },
