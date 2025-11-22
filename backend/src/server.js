@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// 👉 Importamos la base de datos
+const pool = require('./config/database');
+
+// 👉 Importamos las rutas
 const authRoutes = require('./routes/authRoutes');
 const requestRoutes = require('./routes/requestRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
@@ -36,6 +40,23 @@ app.get('/health', (req, res) => {
     message: 'Server is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// 👉 Test DB route
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({
+      success: true,
+      time: result.rows[0].now
+    });
+  } catch (err) {
+    console.error('DB test error:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error conectando a la base de datos'
+    });
+  }
 });
 
 // 404 handler
