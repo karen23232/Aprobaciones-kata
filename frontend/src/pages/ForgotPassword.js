@@ -7,8 +7,8 @@ import '../styles/Auth.css';
 
 const ForgotPassword = () => {
   const [method, setMethod] = useState('email'); // 'email' o 'token'
-  const [email, setEmail] = useState('');
-  const [token, setToken] = useState('');
+  const [emailForEmail, setEmailForEmail] = useState('');
+  const [emailForToken, setEmailForToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -20,6 +20,24 @@ const ForgotPassword = () => {
     setError('');
     setSuccess(false);
     setDevToken('');
+    setCopied(false);
+  };
+
+  const validateEmailInput = (email) => {
+    if (!email) {
+      return 'El email es requerido';
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      return 'Ingresa un email válido (ejemplo: usuario@correo.com)';
+    }
+
+    if (!validateEmail(email)) {
+      return 'Email inválido';
+    }
+
+    return null;
   };
 
   const handleEmailSubmit = async (e) => {
@@ -29,26 +47,45 @@ const ForgotPassword = () => {
     setDevToken('');
     setCopied(false);
 
-    if (!email) {
-      setError('El email es requerido');
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
-      setError('Ingresa un email válido (ejemplo: usuario@correo.com)');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError('Email inválido');
+    const validationError = validateEmailInput(emailForEmail);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await authService.forgotPassword(email);
+      const response = await authService.forgotPassword(emailForEmail);
+      setSuccess(true);
+      
+      if (response.devToken) {
+        setDevToken(response.devToken);
+      }
+    } catch (err) {
+      setError(err.message || 'Error al procesar la solicitud');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTokenSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess(false);
+    setDevToken('');
+    setCopied(false);
+
+    const validationError = validateEmailInput(emailForToken);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await authService.forgotPassword(emailForToken);
       setSuccess(true);
       
       if (response.devToken) {
@@ -221,8 +258,8 @@ const ForgotPassword = () => {
                     type="email"
                     id="email"
                     name="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={emailForEmail}
+                    onChange={(e) => setEmailForEmail(e.target.value)}
                     className="form-input-new"
                     placeholder="tu@email.com"
                     autoComplete="email"
@@ -230,7 +267,7 @@ const ForgotPassword = () => {
                   />
                 </div>
                 <small className="input-hint">
-                  Te enviaremos un enlace de recuperación a este correo
+                  Te enviaremos instrucciones de recuperación a este correo
                 </small>
               </div>
 
@@ -255,32 +292,72 @@ const ForgotPassword = () => {
 
           {/* Método Token */}
           {method === 'token' && (
-            <div className="token-method-content">
+            <form onSubmit={handleTokenSubmit} className="auth-form-new" noValidate>
               <div className="info-box">
                 <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
                 <div>
-                  <p className="info-title">¿Ya tienes un token?</p>
+                  <p className="info-title">Genera tu token</p>
                   <p className="info-text">
-                    Si recibiste un token por email o ya lo tienes, puedes usarlo directamente para restablecer tu contraseña.
+                    Ingresa tu email registrado para generar un token de recuperación que podrás usar inmediatamente.
                   </p>
                 </div>
               </div>
 
-              <Link to="/reset-password" className="btn-new btn-secondary-new btn-full-new">
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                </svg>
-                Usar Token para Restablecer
-              </Link>
-            </div>
+              <div className="form-group-new">
+                <label htmlFor="emailToken" className="form-label-new">
+                  Correo Electrónico Registrado
+                </label>
+                <div className="input-wrapper">
+                  <svg className="input-icon" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <input
+                    type="email"
+                    id="emailToken"
+                    name="emailToken"
+                    value={emailForToken}
+                    onChange={(e) => setEmailForToken(e.target.value)}
+                    className="form-input-new"
+                    placeholder="tu@email.com"
+                    autoComplete="email"
+                    disabled={loading || success}
+                  />
+                </div>
+                <small className="input-hint">
+                  Verifica que este email esté registrado en tu cuenta
+                </small>
+              </div>
+
+              <button
+                type="submit"
+                className="btn-new btn-primary-new btn-full-new"
+                disabled={loading || success}
+              >
+                {loading ? (
+                  <>
+                    <LoadingSpinner size="small" />
+                    <span>Generando token...</span>
+                  </>
+                ) : success ? (
+                  '✓ Token Generado'
+                ) : (
+                  <>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Generar Token
+                  </>
+                )}
+              </button>
+            </form>
           )}
 
-          {success && method === 'email' && (
+          {success && (
             <div className="quick-access">
               <Link to="/reset-password" className="quick-access-link">
-                ¿Ya tienes tu token? Úsalo aquí →
+                {devToken ? 'Usar este token ahora →' : '¿Ya tienes tu token? Úsalo aquí →'}
               </Link>
             </div>
           )}
