@@ -132,16 +132,16 @@ const Login = () => {
         // Establecer el error
         setApiError(errorMessage);
         console.log('🚨 Error mostrado:', errorMessage);
-        console.log('⏰ Timer de 30 segundos iniciado');
+        console.log('⏰ Timer de 60 segundos (1 minuto) iniciado');
         
-        // Timer de 30 segundos usando useRef
+        // Timer de 60 segundos usando useRef
         errorTimerRef.current = setTimeout(() => {
-          console.log('⏰ 30 segundos pasaron, limpiando error');
+          console.log('⏰ 60 segundos (1 minuto) pasaron, limpiando error');
           if (isMountedRef.current) {
             setApiError('');
           }
           errorTimerRef.current = null;
-        }, 30000); // 30 segundos
+        }, 60000); // 60 segundos = 1 minuto
       }
     } finally {
       if (isMountedRef.current) {
@@ -211,7 +211,7 @@ const Login = () => {
             <p className="auth-subtitle-new">Ingresa a tu cuenta para continuar</p>
           </div>
 
-          {/* ⚠️ MENSAJE DE ERROR - 30 SEGUNDOS */}
+          {/* ⚠️ MENSAJE DE ERROR - 60 SEGUNDOS (1 MINUTO) */}
           {apiError && (
             <div className="alert alert-error" style={{ marginBottom: '20px' }}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
