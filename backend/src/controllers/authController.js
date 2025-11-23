@@ -30,7 +30,7 @@ const register = async (req, res) => {
       });
     }
 
-    // Crear usuario (asume que tienes un método User.create)
+    // Crear usuario
     const user = await User.create({
       nombre,
       email,
@@ -86,7 +86,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Verificar contraseña (asume que tienes un método User.comparePassword)
+    // Verificar contraseña
     const isPasswordValid = await User.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -132,7 +132,6 @@ const login = async (req, res) => {
 // ==================== OBTENER PERFIL ====================
 const getProfile = async (req, res) => {
   try {
-    // El middleware 'protect' ya validó el token y agregó req.user
     const userId = req.user.id;
 
     const user = await User.findById(userId);
@@ -199,8 +198,7 @@ const forgotPassword = async (req, res) => {
 
     const { user, resetToken } = result;
 
-    // 🎯 IMPORTANTE: En producción esto se enviaría por email
-    // Para desarrollo/localhost, lo mostramos en consola
+    // 🎯 MOSTRAR TOKEN EN CONSOLA DEL SERVIDOR
     console.log('\n' + '='.repeat(60));
     console.log('🔐 TOKEN DE RECUPERACIÓN DE CONTRASEÑA');
     console.log('='.repeat(60));
@@ -209,12 +207,12 @@ const forgotPassword = async (req, res) => {
     console.log(`Expira en: 1 hora`);
     console.log('='.repeat(60) + '\n');
 
-    // En localhost, devolvemos el token en la respuesta (SOLO PARA DESARROLLO)
+    // ✅ SIEMPRE DEVOLVER EL TOKEN (para desarrollo y testing)
     res.status(200).json({
       success: true,
       message: 'Token de recuperación generado exitosamente',
-      // ⚠️ ELIMINAR ESTO EN PRODUCCIÓN
-      devToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+      devToken: resetToken,
+      userEmail: user.email
     });
 
   } catch (error) {
