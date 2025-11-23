@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import PasswordInput from '../components/PasswordInput';
@@ -18,6 +18,16 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [errorTimer, setErrorTimer] = useState(null);
+
+  // Limpiar timer al desmontar componente
+  useEffect(() => {
+    return () => {
+      if (errorTimer) {
+        clearTimeout(errorTimer);
+      }
+    };
+  }, [errorTimer]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,9 +42,7 @@ const Login = () => {
         [name]: ''
       }));
     }
-    if (apiError) {
-      setApiError('');
-    }
+    // NO limpiar apiError al escribir - solo después de 15 segundos
   };
 
   const validateForm = () => {
@@ -61,6 +69,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Limpiar timer anterior si existe
+    if (errorTimer) {
+      clearTimeout(errorTimer);
+    }
+    
     setApiError('');
 
     if (!validateForm()) {
@@ -92,9 +106,20 @@ const Login = () => {
           errorMessage = '❌ Email o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
         } else if (error.message?.includes('no encontrado')) {
           errorMessage = '❌ No existe una cuenta con este email. ¿Deseas registrarte?';
+        } else if (error.message?.includes('desactivada')) {
+          errorMessage = '❌ Tu cuenta está desactivada. Contacta al administrador.';
+        } else if (error.message) {
+          errorMessage = `❌ ${error.message}`;
         }
         
         setApiError(errorMessage);
+        
+        // ⏰ El error permanecerá visible por 15 segundos
+        const timer = setTimeout(() => {
+          setApiError('');
+        }, 15000); // 15 segundos
+        
+        setErrorTimer(timer);
       }
     } finally {
       setLoading(false);
