@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import authService from '../services/authService';
 import PasswordInput from '../components/PasswordInput';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { validateEmail } from '../utils/validation';
@@ -8,7 +8,6 @@ import '../styles/Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -19,15 +18,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
   
-  // Usar useRef para mantener el timer sin causar re-renders
   const errorTimerRef = useRef(null);
   const isMountedRef = useRef(true);
 
-  // Limpiar timer al desmontar
   useEffect(() => {
     isMountedRef.current = true;
+    console.log('🔧 Login component montado');
     
     return () => {
+      console.log('🔧 Login component desmontado');
       isMountedRef.current = false;
       if (errorTimerRef.current) {
         clearTimeout(errorTimerRef.current);
@@ -36,6 +35,11 @@ const Login = () => {
     };
   }, []);
 
+  // Log cada vez que apiError cambia
+  useEffect(() => {
+    console.log('📊 apiError cambió a:', apiError || '(vacío)');
+  }, [apiError]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -43,14 +47,12 @@ const Login = () => {
       [name]: value
     }));
     
-    // Solo limpiar errores de validación
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
       }));
     }
-    // NUNCA limpiar apiError al escribir
   };
 
   const validateForm = () => {
@@ -77,82 +79,96 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('📤 handleSubmit iniciado');
     
-    // Limpiar timer anterior
     if (errorTimerRef.current) {
+      console.log('🧹 Limpiando timer anterior');
       clearTimeout(errorTimerRef.current);
       errorTimerRef.current = null;
     }
     
+    console.log('🧹 Limpiando apiError');
     setApiError('');
 
     if (!validateForm()) {
+      console.log('❌ Validación falló');
       return;
     }
 
+    console.log('✅ Validación exitosa, iniciando login');
     setLoading(true);
 
     try {
-      await login({
+      console.log('🚀 Llamando a authService.login()');
+      const response = await authService.login({
         email: formData.email,
         password: formData.password,
       });
 
-      // Solo navegar si el componente sigue montado
-      if (isMountedRef.current) {
-        navigate('/dashboard');
+      console.log('✅ Login exitoso:', response);
+      
+      if (response.success && response.data?.user) {
+        const user = response.data.user;
+        console.log('👤 Usuario logueado:', user);
+        
+        if (user.rol === 'admin' || user.rol === 'administrador') {
+          console.log('🎯 Redirigiendo a /admin/dashboard');
+          navigate('/admin/dashboard');
+        } else if (user.rol === 'aprobador') {
+          console.log('🎯 Redirigiendo a /approver/dashboard');
+          navigate('/approver/dashboard');
+        } else {
+          console.log('🎯 Redirigiendo a /dashboard');
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
-      console.error('❌ Error en login:', error);
+      console.error('❌❌❌ ERROR CAPTURADO:', error);
+      console.log('Error message:', error.message);
+      console.log('Error completo:', JSON.stringify(error, null, 2));
       
-      // Solo procesar error si el componente sigue montado
       if (!isMountedRef.current) {
+        console.log('⚠️ Componente desmontado, no actualizar estado');
         return;
       }
       
-      if (error.errors && Array.isArray(error.errors)) {
-        const newErrors = {};
-        error.errors.forEach(err => {
-          newErrors[err.field] = err.message;
-        });
-        setErrors(newErrors);
-      } else {
-        let errorMessage = 'Error al iniciar sesión. Por favor intenta de nuevo.';
-        
-        if (error.message?.includes('Credenciales inválidas')) {
-          errorMessage = '❌ Email o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
-        } else if (error.message?.includes('no encontrado')) {
-          errorMessage = '❌ No existe una cuenta con este email. ¿Deseas registrarte?';
-        } else if (error.message?.includes('desactivada')) {
-          errorMessage = '❌ Tu cuenta está desactivada. Contacta al administrador.';
-        } else if (error.message) {
-          errorMessage = `❌ ${error.message}`;
-        }
-        
-        // Establecer el error
-        setApiError(errorMessage);
-        console.log('🚨 Error mostrado:', errorMessage);
-        console.log('⏰ Timer de 60 segundos (1 minuto) iniciado');
-        
-        // Timer de 60 segundos usando useRef
-        errorTimerRef.current = setTimeout(() => {
-          console.log('⏰ 60 segundos (1 minuto) pasaron, limpiando error');
-          if (isMountedRef.current) {
-            setApiError('');
-          }
-          errorTimerRef.current = null;
-        }, 60000); // 60 segundos = 1 minuto
+      let errorMessage = '❌ Email o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
+      
+      if (error.message?.toLowerCase().includes('credenciales')) {
+        errorMessage = '❌ Email o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
+      } else if (error.message?.toLowerCase().includes('no encontrado')) {
+        errorMessage = '❌ No existe una cuenta con este email. ¿Deseas registrarte?';
+      } else if (error.message?.toLowerCase().includes('desactivada')) {
+        errorMessage = '❌ Tu cuenta está desactivada. Contacta al administrador.';
+      } else if (error.message) {
+        errorMessage = `❌ ${error.message}`;
       }
+      
+      console.log('🚨🚨🚨 ESTABLECIENDO API ERROR:', errorMessage);
+      setApiError(errorMessage);
+      console.log('⏰ Iniciando timer de 60 segundos');
+      
+      errorTimerRef.current = setTimeout(() => {
+        console.log('⏰ 60 segundos pasaron, limpiando error');
+        if (isMountedRef.current) {
+          setApiError('');
+        }
+        errorTimerRef.current = null;
+      }, 60000);
+      
+      console.log('✅ Timer guardado, apiError debe estar visible ahora');
     } finally {
+      console.log('🏁 Finalizando, setLoading(false)');
       if (isMountedRef.current) {
         setLoading(false);
       }
     }
   };
 
+  console.log('🎨 RENDER - apiError actual:', apiError || '(vacío)');
+
   return (
     <div className="auth-container-split">
-      {/* Panel Izquierdo - Imagen y Mensaje de Bienvenida */}
       <div className="auth-left-panel">
         <div className="auth-left-overlay"></div>
         <div className="auth-left-content">
@@ -203,7 +219,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Panel Derecho - Formulario */}
       <div className="auth-right-panel">
         <div className="auth-card-new">
           <div className="auth-card-header">
@@ -211,9 +226,11 @@ const Login = () => {
             <p className="auth-subtitle-new">Ingresa a tu cuenta para continuar</p>
           </div>
 
-          {/* ⚠️ MENSAJE DE ERROR - 60 SEGUNDOS (1 MINUTO) */}
           {apiError && (
-            <div className="alert alert-error" style={{ marginBottom: '20px' }}>
+            <div className="alert alert-error" style={{ 
+              marginBottom: '20px',
+              animation: 'slideDown 0.3s ease'
+            }}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
