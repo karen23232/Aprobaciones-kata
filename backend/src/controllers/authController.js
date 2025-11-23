@@ -166,7 +166,7 @@ const getProfile = async (req, res) => {
 // ==================== FORGOT PASSWORD ====================
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, method } = req.body; // Agregar método
 
     // Validar email
     if (!email) {
@@ -189,10 +189,10 @@ const forgotPassword = async (req, res) => {
     const result = await User.createPasswordResetToken(email);
 
     if (!result) {
-      // Por seguridad, no revelar si el email existe o no
-      return res.status(200).json({
-        success: true,
-        message: 'Si el email existe, recibirás instrucciones para recuperar tu contraseña'
+      // ❌ EMAIL NO EXISTE - Mensaje claro
+      return res.status(404).json({
+        success: false,
+        message: '❌ Este email no está registrado. Por favor, regístrate primero para continuar.'
       });
     }
 
@@ -205,15 +205,32 @@ const forgotPassword = async (req, res) => {
     console.log(`Usuario: ${user.nombre} (${user.email})`);
     console.log(`Token: ${resetToken}`);
     console.log(`Expira en: 1 hora`);
+    console.log(`Método: ${method || 'email'}`);
     console.log('='.repeat(60) + '\n');
 
-    // ✅ SIEMPRE DEVOLVER EL TOKEN (para desarrollo y testing)
-    res.status(200).json({
-      success: true,
-      message: 'Token de recuperación generado exitosamente',
-      devToken: resetToken,
-      userEmail: user.email
-    });
+    // ✅ DIFERENCIAR POR MÉTODO
+    if (method === 'token') {
+      // MÉTODO TOKEN: Devolver token inmediatamente
+      return res.status(200).json({
+        success: true,
+        message: 'Token generado exitosamente',
+        devToken: resetToken,
+        userEmail: user.email,
+        method: 'token'
+      });
+    } else {
+      // MÉTODO EMAIL: NO devolver token, solo confirmar envío
+      // 📧 TODO: Aquí iría el código para enviar el email real
+      // await sendPasswordResetEmail(user.email, resetToken);
+      
+      return res.status(200).json({
+        success: true,
+        message: `✅ Se han enviado las instrucciones de recuperación al correo ${user.email}`,
+        userEmail: user.email,
+        method: 'email'
+        // NO incluir devToken aquí
+      });
+    }
 
   } catch (error) {
     console.error('Error en forgotPassword:', error);

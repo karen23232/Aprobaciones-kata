@@ -56,9 +56,10 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await authService.forgotPassword(emailForEmail);
+      const response = await authService.forgotPassword(emailForEmail, 'email');
       setSuccess(true);
       
+      // Para método email, NO debería haber devToken
       if (response.devToken) {
         setDevToken(response.devToken);
       }
@@ -85,7 +86,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await authService.forgotPassword(emailForToken);
+      const response = await authService.forgotPassword(emailForToken, 'token');
       setSuccess(true);
       
       if (response.devToken) {
