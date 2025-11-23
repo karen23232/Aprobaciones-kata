@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import PasswordInput from '../components/PasswordInput';
@@ -18,16 +18,23 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
-  const [errorTimer, setErrorTimer] = useState(null);
+  
+  // Usar useRef para mantener el timer sin causar re-renders
+  const errorTimerRef = useRef(null);
+  const isMountedRef = useRef(true);
 
-  // Limpiar timer al desmontar componente
+  // Limpiar timer al desmontar
   useEffect(() => {
+    isMountedRef.current = true;
+    
     return () => {
-      if (errorTimer) {
-        clearTimeout(errorTimer);
+      isMountedRef.current = false;
+      if (errorTimerRef.current) {
+        clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = null;
       }
     };
-  }, [errorTimer]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,14 +43,14 @@ const Login = () => {
       [name]: value
     }));
     
-    // Solo limpiar errores de validación de campos
+    // Solo limpiar errores de validación
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
       }));
     }
-    // NO limpiar apiError - se queda por 15 segundos
+    // NUNCA limpiar apiError al escribir
   };
 
   const validateForm = () => {
@@ -71,9 +78,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Limpiar timer anterior si existe
-    if (errorTimer) {
-      clearTimeout(errorTimer);
+    // Limpiar timer anterior
+    if (errorTimerRef.current) {
+      clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
     }
     
     setApiError('');
@@ -90,9 +98,17 @@ const Login = () => {
         password: formData.password,
       });
 
-      navigate('/dashboard');
+      // Solo navegar si el componente sigue montado
+      if (isMountedRef.current) {
+        navigate('/dashboard');
+      }
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ Error en login:', error);
+      
+      // Solo procesar error si el componente sigue montado
+      if (!isMountedRef.current) {
+        return;
+      }
       
       if (error.errors && Array.isArray(error.errors)) {
         const newErrors = {};
@@ -113,17 +129,24 @@ const Login = () => {
           errorMessage = `❌ ${error.message}`;
         }
         
+        // Establecer el error
         setApiError(errorMessage);
+        console.log('🚨 Error mostrado:', errorMessage);
+        console.log('⏰ Timer de 30 segundos iniciado');
         
-        // ⏰ El error permanecerá visible por 15 segundos
-        const timer = setTimeout(() => {
-          setApiError('');
-        }, 30000); // 15 segundos
-        
-        setErrorTimer(timer);
+        // Timer de 30 segundos usando useRef
+        errorTimerRef.current = setTimeout(() => {
+          console.log('⏰ 30 segundos pasaron, limpiando error');
+          if (isMountedRef.current) {
+            setApiError('');
+          }
+          errorTimerRef.current = null;
+        }, 30000); // 30 segundos
       }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -188,12 +211,13 @@ const Login = () => {
             <p className="auth-subtitle-new">Ingresa a tu cuenta para continuar</p>
           </div>
 
+          {/* ⚠️ MENSAJE DE ERROR - 30 SEGUNDOS */}
           {apiError && (
-            <div className="alert alert-error">
+            <div className="alert alert-error" style={{ marginBottom: '20px' }}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
-              {apiError}
+              <strong>{apiError}</strong>
             </div>
           )}
 
@@ -215,6 +239,7 @@ const Login = () => {
                   className={`form-input-new ${errors.email ? 'error' : ''}`}
                   placeholder="tu@email.com"
                   autoComplete="email"
+                  disabled={loading}
                 />
               </div>
               {errors.email && <span className="error-message">{errors.email}</span>}
@@ -230,6 +255,7 @@ const Login = () => {
                 placeholder="Ingresa tu contraseña"
                 name="password"
                 error={errors.password}
+                disabled={loading}
               />
               
               <div className="forgot-password">
