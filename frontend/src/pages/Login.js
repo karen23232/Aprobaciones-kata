@@ -36,13 +36,14 @@ const Login = () => {
       [name]: value
     }));
     
+    // Solo limpiar errores de validación de campos
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
       }));
     }
-    // NO limpiar apiError al escribir - solo después de 15 segundos
+    // NO limpiar apiError - se queda por 15 segundos
   };
 
   const validateForm = () => {
