@@ -2,9 +2,12 @@ import api from './api';
 
 const authService = {
   // Solicitar recuperación de contraseña
-  forgotPassword: async (email) => {
+  forgotPassword: async (email, method = 'email') => {
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post('/auth/forgot-password', { 
+        email,
+        method  // 👈 IMPORTANTE: Enviar el método
+      });
       return response.data;
     } catch (error) {
       // ✅ CORRECCIÓN: Asegurar que siempre haya un mensaje de error
