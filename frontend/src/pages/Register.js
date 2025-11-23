@@ -51,8 +51,18 @@ const Register = () => {
     const nameValidation = validateName(formData.nombre);
     if (!nameValidation.isValid) newErrors.nombre = nameValidation.error;
 
-    if (!formData.email) newErrors.email = 'El email es requerido';
-    else if (!validateEmail(formData.email)) newErrors.email = 'Email inválido';
+    // Validación mejorada de email con regex estricto
+    if (!formData.email) {
+      newErrors.email = 'El email es requerido';
+    } else {
+      // Regex que requiere: texto@dominio.extensión
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Ingresa un email válido (ejemplo: usuario@correo.com)';
+      } else if (!validateEmail(formData.email)) {
+        newErrors.email = 'Email inválido';
+      }
+    }
 
     const passwordValidation = validatePassword(formData.password);
     if (!formData.password) newErrors.password = 'La contraseña es requerida';
