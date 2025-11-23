@@ -922,3 +922,785 @@
         font-size: 36px;
     }
 }
+
+/* ============================================ */
+/* ESTILOS PARA FORGOT PASSWORD Y RESET PASSWORD */
+/* ============================================ */
+
+/* Method Tabs (para elegir entre Email o Token) */
+.method-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 4px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.method-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #666;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.method-tab svg {
+    width: 20px;
+    height: 20px;
+}
+
+.method-tab:hover {
+    background: white;
+    color: #003da5;
+}
+
+.method-tab.active {
+    background: white;
+    color: #003da5;
+    border-color: #003da5;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.15);
+}
+
+/* Token Method Content */
+.token-method-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-box {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f0f9ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: #3b82f6;
+}
+
+.info-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0 0 4px 0;
+}
+
+.info-text {
+    font-size: 14px;
+    color: #1e40af;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Dev Token Box */
+.dev-token-box {
+    padding: 16px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.dev-token-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #92400e;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.dev-token-header svg {
+    width: 20px;
+    height: 20px;
+}
+
+.dev-token-content {
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+}
+
+.dev-token-content code {
+    display: block;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: #92400e;
+    word-break: break-all;
+}
+
+.btn-copy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 2px solid #fbbf24;
+    border-radius: 6px;
+    color: #92400e;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+    background: #fbbf24;
+    color: white;
+}
+
+.btn-copy.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.btn-copy svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Quick Access Link */
+.quick-access {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.quick-access-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #003da5;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.quick-access-link:hover {
+    color: #ffd100;
+    text-decoration: underline;
+}
+
+/* Back Link */
+.auth-link-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #003da5;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-link-back:hover {
+    color: #ffd100;
+}
+
+.auth-link-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+.divider-dot {
+    color: #ccc;
+    margin: 0 8px;
+}
+
+/* Input Hint */
+.input-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Alert Text */
+.alert-text {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+/* Secondary Button */
+.btn-secondary-new {
+    background: white;
+    color: #003da5;
+    border: 2px solid #003da5;
+    box-shadow: none;
+}
+
+.btn-secondary-new:hover:not(:disabled) {
+    background: #003da5;
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 61, 165, 0.2);
+}
+
+/* Password Requirements con validación en tiempo real */
+.requirement-item.valid {
+    color: #10b981;
+}
+
+.requirement-item.valid svg {
+    color: #10b981;
+}
+
+/* Success Card (página de éxito) */
+.success-card {
+    text-align: center;
+    padding: 50px 40px;
+}
+
+.success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    color: white;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-icon svg {
+    width: 60px;
+    height: 60px;
+}
+
+.success-spinner {
+    margin: 24px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.success-spinner p {
+    margin-top: 12px;
+    color: #666;
+    font-size: 14px;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - FORGOT & RESET PASSWORD */
+/* ============================================ */
+
+@media (max-width: 767px) {
+    .method-tabs {
+        gap: 8px;
+    }
+
+    .method-tab {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .method-tab svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .info-box {
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .dev-token-box {
+        padding: 14px;
+    }
+
+    .success-card {
+        padding: 40px 30px;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .success-icon svg {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .method-tabs {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .method-tab {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .info-box {
+        padding: 12px;
+    }
+
+    .info-title {
+        font-size: 14px;
+    }
+
+    .info-text {
+        font-size: 13px;
+    }
+
+    .dev-token-content code {
+        font-size: 11px;
+    }
+
+    .success-card {
+        padding: 30px 20px;
+    }
+
+    .success-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .success-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .auth-link-back {
+        font-size: 13px;
+    }
+
+    .divider-dot {
+        display: none;
+    }
+
+    .auth-footer-new {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+/* ============================================ */
+/* ESTILOS PARA RECUPERACIÓN DE CONTRASEÑA */
+/* ============================================ */
+
+/* Method Tabs */
+.method-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 4px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.method-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #666;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.method-tab svg {
+    width: 20px;
+    height: 20px;
+}
+
+.method-tab:hover {
+    background: white;
+    color: #003da5;
+}
+
+.method-tab.active {
+    background: white;
+    color: #003da5;
+    border-color: #003da5;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.15);
+}
+
+/* Token Method Content */
+.token-method-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-box {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f0f9ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: #3b82f6;
+}
+
+.info-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0 0 4px 0;
+}
+
+.info-text {
+    font-size: 14px;
+    color: #1e40af;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Dev Token Box */
+.dev-token-box {
+    padding: 16px;
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.dev-token-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #92400e;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.dev-token-header svg {
+    width: 20px;
+    height: 20px;
+}
+
+.dev-token-content {
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+}
+
+.dev-token-content code {
+    display: block;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: #92400e;
+    word-break: break-all;
+}
+
+.btn-copy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 2px solid #fbbf24;
+    border-radius: 6px;
+    color: #92400e;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+    background: #fbbf24;
+    color: white;
+}
+
+.btn-copy.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.btn-copy svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Quick Access Link */
+.quick-access {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.quick-access-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #003da5;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.quick-access-link:hover {
+    color: #ffd100;
+    text-decoration: underline;
+}
+
+/* Back Link */
+.auth-link-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #003da5;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-link-back:hover {
+    color: #ffd100;
+}
+
+.auth-link-back svg {
+    width: 16px;
+    height: 16px;
+}
+
+.divider-dot {
+    color: #ccc;
+    margin: 0 8px;
+}
+
+/* Input Hint */
+.input-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Alert Text */
+.alert-text {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+/* Secondary Button */
+.btn-secondary-new {
+    background: white;
+    color: #003da5;
+    border: 2px solid #003da5;
+    box-shadow: none;
+}
+
+.btn-secondary-new:hover:not(:disabled) {
+    background: #003da5;
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 61, 165, 0.2);
+}
+
+/* Password Requirements con validación */
+.requirement-item.valid {
+    color: #10b981;
+}
+
+.requirement-item.valid svg {
+    color: #10b981;
+}
+
+/* Success Card */
+.success-card {
+    text-align: center;
+    padding: 50px 40px;
+}
+
+.success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    color: white;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-icon svg {
+    width: 60px;
+    height: 60px;
+}
+
+.success-spinner {
+    margin: 24px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.success-spinner p {
+    margin-top: 12px;
+    color: #666;
+    font-size: 14px;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - RECUPERACIÓN DE CONTRASEÑA */
+/* ============================================ */
+
+@media (max-width: 767px) {
+    .method-tabs {
+        gap: 8px;
+    }
+
+    .method-tab {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .method-tab svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .info-box {
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .dev-token-box {
+        padding: 14px;
+    }
+
+    .success-card {
+        padding: 40px 30px;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .success-icon svg {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .method-tabs {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .method-tab {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .info-box {
+        padding: 12px;
+    }
+
+    .info-title {
+        font-size: 14px;
+    }
+
+    .info-text {
+        font-size: 13px;
+    }
+
+    .dev-token-content code {
+        font-size: 11px;
+    }
+
+    .success-card {
+        padding: 30px 20px;
+    }
+
+    .success-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .success-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .auth-link-back {
+        font-size: 13px;
+    }
+
+    .divider-dot {
+        display: none;
+    }
+
+    .auth-footer-new {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
