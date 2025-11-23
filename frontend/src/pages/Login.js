@@ -6,7 +6,6 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { validateEmail } from '../utils/validation';
 import '../styles/Auth.css';
 
-
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -27,7 +26,6 @@ const Login = () => {
       [name]: value
     }));
     
-    // Limpiar errores al escribir
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -44,8 +42,13 @@ const Login = () => {
 
     if (!formData.email) {
       newErrors.email = 'El email es requerido';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email inválido';
+    } else {
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Ingresa un email válido (ejemplo: usuario@correo.com)';
+      } else if (!validateEmail(formData.email)) {
+        newErrors.email = 'Email inválido';
+      }
     }
 
     if (!formData.password) {
@@ -99,86 +102,145 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <img src="/assets/images/Logo.png" alt="Logo" />
-        </div>
-        <div className="auth-header">
-          <h1 className="auth-title">Iniciar Sesión</h1>
-          <p className="auth-subtitle">Ingresa a tu cuenta para continuar</p>
-        </div>
-
-        {apiError && (
-          <div className="alert alert-error">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            {apiError}
+    <div className="auth-container-split">
+      {/* Panel Izquierdo - Imagen y Mensaje de Bienvenida */}
+      <div className="auth-left-panel">
+        <div className="auth-left-overlay"></div>
+        <div className="auth-left-content">
+          <div className="auth-brand">
+            <img src="/assets/images/Logo.png" alt="Banco de Bogotá" className="auth-brand-logo" />
+            <h1 className="auth-brand-title">Banco de Bogotá</h1>
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="auth-form" noValidate>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`form-input ${errors.email ? 'error' : ''}`}
-              placeholder="tu@email.com"
-              autoComplete="email"
-            />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+          
+          <div className="auth-welcome">
+            <h2 className="auth-welcome-title">Bienvenido</h2>
+            <p className="auth-welcome-subtitle">Sistema de Servicios y Aprobaciones</p>
+            <div className="auth-welcome-divider"></div>
+            <p className="auth-welcome-description">
+              Gestiona tus solicitudes de manera eficiente y segura
+            </p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Contraseña
-            </label>
-            <PasswordInput
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Ingresa tu contraseña"
-              name="password"
-              error={errors.password}
-            />
-            
-            {/* Enlace de recuperación de contraseña */}
-            <div className="forgot-password">
-              <Link to="/forgot-password">
-                ¿Olvidaste tu contraseña?
-              </Link>
+          <div className="auth-features">
+            <div className="auth-feature">
+              <div className="auth-feature-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span>Aprobaciones en tiempo real</span>
+            </div>
+            <div className="auth-feature">
+              <div className="auth-feature-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <span>Seguridad garantizada</span>
+            </div>
+            <div className="auth-feature">
+              <div className="auth-feature-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span>Reportes detallados</span>
             </div>
           </div>
+        </div>
+        
+        <div className="auth-left-image">
+          <img src="/assets/images/Imagen 2.jpg" alt="Banco de Bogotá" />
+        </div>
+      </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-full"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <LoadingSpinner size="small" />
-                <span>Iniciando sesión...</span>
-              </>
-            ) : (
-              'Iniciar Sesión'
-            )}
-          </button>
-        </form>
+      {/* Panel Derecho - Formulario */}
+      <div className="auth-right-panel">
+        <div className="auth-card-new">
+          <div className="auth-card-header">
+            <h1 className="auth-title-new">Iniciar Sesión</h1>
+            <p className="auth-subtitle-new">Ingresa a tu cuenta para continuar</p>
+          </div>
 
-        <div className="auth-footer">
-          <p>
-            ¿No tienes una cuenta?{' '}
-            <Link to="/register" className="auth-link">
-              Regístrate aquí
-            </Link>
-          </p>
+          {apiError && (
+            <div className="alert alert-error">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              {apiError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-form-new" noValidate>
+            <div className="form-group-new">
+              <label htmlFor="email" className="form-label-new">
+                Correo Electrónico
+              </label>
+              <div className="input-wrapper">
+                <svg className="input-icon" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`form-input-new ${errors.email ? 'error' : ''}`}
+                  placeholder="tu@email.com"
+                  autoComplete="email"
+                />
+              </div>
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
+
+            <div className="form-group-new">
+              <label htmlFor="password" className="form-label-new">
+                Contraseña
+              </label>
+              <PasswordInput
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Ingresa tu contraseña"
+                name="password"
+                error={errors.password}
+              />
+              
+              <div className="forgot-password">
+                <Link to="/forgot-password">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-new btn-primary-new btn-full-new"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <LoadingSpinner size="small" />
+                  <span>Iniciando sesión...</span>
+                </>
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </button>
+          </form>
+
+          <div className="auth-divider">
+            <span>o</span>
+          </div>
+
+          <div className="auth-footer-new">
+            <p>
+              ¿No tienes una cuenta?{' '}
+              <Link to="/register" className="auth-link-new">
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
