@@ -35,7 +35,6 @@ const Login = () => {
     };
   }, []);
 
-  // Log cada vez que apiError cambia
   useEffect(() => {
     console.log('📊 apiError cambió a:', apiError || '(vacío)');
   }, [apiError]);
@@ -110,22 +109,14 @@ const Login = () => {
       if (response.success && response.data?.user) {
         const user = response.data.user;
         console.log('👤 Usuario logueado:', user);
+        console.log('🎯 Redirigiendo a /dashboard');
         
-        if (user.rol === 'admin' || user.rol === 'administrador') {
-          console.log('🎯 Redirigiendo a /admin/dashboard');
-          navigate('/admin/dashboard');
-        } else if (user.rol === 'aprobador') {
-          console.log('🎯 Redirigiendo a /approver/dashboard');
-          navigate('/approver/dashboard');
-        } else {
-          console.log('🎯 Redirigiendo a /dashboard');
-          navigate('/dashboard');
-        }
+        // ✅ CORRECCIÓN: Todos van a /dashboard sin importar el rol
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       console.error('❌❌❌ ERROR CAPTURADO:', error);
       console.log('Error message:', error.message);
-      console.log('Error completo:', JSON.stringify(error, null, 2));
       
       if (!isMountedRef.current) {
         console.log('⚠️ Componente desmontado, no actualizar estado');
@@ -144,9 +135,8 @@ const Login = () => {
         errorMessage = `❌ ${error.message}`;
       }
       
-      console.log('🚨🚨🚨 ESTABLECIENDO API ERROR:', errorMessage);
+      console.log('🚨 ESTABLECIENDO API ERROR:', errorMessage);
       setApiError(errorMessage);
-      console.log('⏰ Iniciando timer de 60 segundos');
       
       errorTimerRef.current = setTimeout(() => {
         console.log('⏰ 60 segundos pasaron, limpiando error');
@@ -155,8 +145,6 @@ const Login = () => {
         }
         errorTimerRef.current = null;
       }, 60000);
-      
-      console.log('✅ Timer guardado, apiError debe estar visible ahora');
     } finally {
       console.log('🏁 Finalizando, setLoading(false)');
       if (isMountedRef.current) {
@@ -164,8 +152,6 @@ const Login = () => {
       }
     }
   };
-
-  console.log('🎨 RENDER - apiError actual:', apiError || '(vacío)');
 
   return (
     <div className="auth-container-split">
