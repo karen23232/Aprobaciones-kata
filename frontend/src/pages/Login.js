@@ -118,7 +118,7 @@ const Login = () => {
         // ⏰ El error permanecerá visible por 15 segundos
         const timer = setTimeout(() => {
           setApiError('');
-        }, 15000); // 15 segundos
+        }, 30000); // 15 segundos
         
         setErrorTimer(timer);
       }
