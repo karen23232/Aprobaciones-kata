@@ -1,0 +1,127 @@
+/* ==================== EMAIL TEMPLATE STYLES ==================== */
+/* Estilos para el correo de recuperación de contraseña */
+/* Este archivo se usa para generar el HTML del email */
+
+/* Body del email */
+.email-body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* Container principal */
+.email-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header del email */
+.email-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #003d82;
+}
+
+.email-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #003d82;
+    margin-bottom: 10px;
+}
+
+/* Título */
+.email-title {
+    color: #003d82;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Contenido */
+.email-content {
+    margin: 30px 0;
+}
+
+/* Botón de acción */
+.email-button-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.email-reset-button {
+    display: inline-block;
+    padding: 15px 40px;
+    background-color: #003d82;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.email-reset-button:hover {
+    background-color: #002555;
+}
+
+/* Caja del token */
+.email-token-box {
+    background-color: #f8f9fa;
+    border-left: 4px solid #003d82;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+/* Caja de información */
+.email-info-box {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+/* Footer */
+.email-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    color: #6c757d;
+    font-size: 12px;
+}
+
+/* Warning text */
+.email-warning {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Lista de seguridad */
+.email-content ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.email-content ul li {
+    padding-left: 20px;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.email-content ul li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #003d82;
+    font-weight: bold;
+}

@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 // Generar JWT
 const generateToken = (userId) => {
@@ -163,10 +164,10 @@ const getProfile = async (req, res) => {
   }
 };
 
-// ==================== FORGOT PASSWORD ====================
+// ==================== FORGOT PASSWORD (ACTUALIZADO CON GMAIL) ====================
 const forgotPassword = async (req, res) => {
   try {
-    const { email, method } = req.body; // Agregar método
+    const { email, method } = req.body;
 
     // Validar email
     if (!email) {
@@ -198,7 +199,7 @@ const forgotPassword = async (req, res) => {
 
     const { user, resetToken } = result;
 
-    // 🎯 MOSTRAR TOKEN EN CONSOLA DEL SERVIDOR
+    // 🎯 MOSTRAR TOKEN EN CONSOLA DEL SERVIDOR (para desarrollo)
     console.log('\n' + '='.repeat(60));
     console.log('🔐 TOKEN DE RECUPERACIÓN DE CONTRASEÑA');
     console.log('='.repeat(60));
@@ -210,7 +211,7 @@ const forgotPassword = async (req, res) => {
 
     // ✅ DIFERENCIAR POR MÉTODO
     if (method === 'token') {
-      // MÉTODO TOKEN: Devolver token inmediatamente
+      // MÉTODO TOKEN: Devolver token inmediatamente (solo desarrollo)
       return res.status(200).json({
         success: true,
         message: 'Token generado exitosamente',
@@ -219,17 +220,29 @@ const forgotPassword = async (req, res) => {
         method: 'token'
       });
     } else {
-      // MÉTODO EMAIL: NO devolver token, solo confirmar envío
-      // 📧 TODO: Aquí iría el código para enviar el email real
-      // await sendPasswordResetEmail(user.email, resetToken);
-      
-      return res.status(200).json({
-        success: true,
-        message: `✅ Se han enviado las instrucciones de recuperación al correo ${user.email}`,
-        userEmail: user.email,
-        method: 'email'
-        // NO incluir devToken aquí
-      });
+      // MÉTODO EMAIL: Enviar correo real a través de Gmail
+      try {
+        await sendPasswordResetEmail(user.email, user.nombre, resetToken);
+        
+        return res.status(200).json({
+          success: true,
+          message: `✅ Se han enviado las instrucciones de recuperación al correo ${user.email}`,
+          userEmail: user.email,
+          method: 'email'
+        });
+      } catch (emailError) {
+        console.error('❌ Error al enviar email:', emailError);
+        
+        // Si falla el envío de email, devolver el token como fallback
+        return res.status(200).json({
+          success: true,
+          message: '⚠️ No se pudo enviar el email. Usa el token mostrado en la consola del servidor.',
+          devToken: resetToken,
+          userEmail: user.email,
+          method: 'email',
+          emailError: emailError.message
+        });
+      }
     }
 
   } catch (error) {
