@@ -1,8 +1,9 @@
 const pool = require('../config/database');
+const { ROLES } = require('./User');
 
 class Request {
   
-  // Generar código único
+  // ==================== GENERAR CÓDIGO ÚNICO ====================
   static generateUniqueCode() {
     const prefix = 'REQ';
     const timestamp = Date.now().toString(36).toUpperCase();
@@ -10,7 +11,7 @@ class Request {
     return `${prefix}-${timestamp}-${random}`;
   }
   
-  // Crear solicitud
+  // ==================== CREAR SOLICITUD ====================
   static async create({ titulo, descripcion, tipo_solicitud_id, solicitante_id, responsable_id }) {
     const client = await pool.connect();
     try {
@@ -64,7 +65,7 @@ class Request {
     }
   }
   
-  // Obtener solicitudes con filtros
+  // ==================== OBTENER SOLICITUDES CON FILTROS ====================
   static async getAll({ userId, rol, estado, limit = 50, offset = 0 }) {
     try {
       let query = `
@@ -85,17 +86,19 @@ class Request {
       const params = [];
       let paramIndex = 1;
       
-      // Filtrar según el rol
-      if (rol === 'solicitante') {
+      // ✅ CORRECCIÓN: Filtrar según el rol (usando roles en español)
+      if (rol === ROLES.EMPLOYEE) {
+        // Colaboradores ven solo sus solicitudes
         query += ` AND s.solicitante_id = $${paramIndex}`;
         params.push(userId);
         paramIndex++;
-      } else if (rol === 'aprobador') {
+      } else if ([ROLES.HR, ROLES.TECH_LEAD].includes(rol)) {
+        // HR y Tech Lead ven solicitudes asignadas a ellos
         query += ` AND s.responsable_id = $${paramIndex}`;
         params.push(userId);
         paramIndex++;
       }
-      // Si es admin, ve todas
+      // Admin ve todas las solicitudes (sin filtro adicional)
       
       // Filtrar por estado
       if (estado) {
@@ -114,11 +117,11 @@ class Request {
       const countParams = [];
       let countIndex = 1;
       
-      if (rol === 'solicitante') {
+      if (rol === ROLES.EMPLOYEE) {
         countQuery += ` AND s.solicitante_id = $${countIndex}`;
         countParams.push(userId);
         countIndex++;
-      } else if (rol === 'aprobador') {
+      } else if ([ROLES.HR, ROLES.TECH_LEAD].includes(rol)) {
         countQuery += ` AND s.responsable_id = $${countIndex}`;
         countParams.push(userId);
         countIndex++;
@@ -139,11 +142,12 @@ class Request {
       };
       
     } catch (error) {
+      console.error('❌ Error en Request.getAll:', error);
       throw error;
     }
   }
   
-  // Obtener solicitud por ID
+  // ==================== OBTENER SOLICITUD POR ID ====================
   static async getById(id) {
     try {
       const query = `
@@ -168,11 +172,12 @@ class Request {
       return result.rows[0] || null;
       
     } catch (error) {
+      console.error('❌ Error en Request.getById:', error);
       throw error;
     }
   }
   
-  // Actualizar estado (aprobar/rechazar)
+  // ==================== ACTUALIZAR ESTADO (APROBAR/RECHAZAR) ====================
   static async updateStatus({ id, estado, comentario, usuario_id }) {
     const client = await pool.connect();
     try {
@@ -234,19 +239,20 @@ class Request {
       
     } catch (error) {
       await client.query('ROLLBACK');
+      console.error('❌ Error en Request.updateStatus:', error);
       throw error;
     } finally {
       client.release();
     }
   }
 
-  // 📝 ACTUALIZAR SOLICITUD CON TRACKING DETALLADO DE CAMBIOS
+  // ==================== ACTUALIZAR SOLICITUD (EDITAR) ====================
   static async update(id, { titulo, descripcion, tipo_solicitud_id, responsable_id, usuario_id }) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
       
-      // 🔍 OBTENER DATOS ANTERIORES PARA COMPARAR
+      // Obtener datos anteriores para comparar
       const oldDataQuery = `
         SELECT 
           s.*,
@@ -264,7 +270,7 @@ class Request {
         throw new Error('Solicitud no encontrada');
       }
       
-      // 🔍 OBTENER NOMBRES DE LOS NUEVOS VALORES
+      // Obtener nombres de los nuevos valores
       const newTypeQuery = `SELECT nombre FROM Tipos_Solicitud WHERE id = $1`;
       const newTypeResult = await client.query(newTypeQuery, [tipo_solicitud_id]);
       const newTypeName = newTypeResult.rows[0]?.nombre;
@@ -273,7 +279,7 @@ class Request {
       const newResponsableResult = await client.query(newResponsableQuery, [responsable_id]);
       const newResponsableName = newResponsableResult.rows[0]?.nombre;
       
-      // 📝 DETECTAR QUÉ CAMBIÓ
+      // Detectar qué cambió
       const cambios = [];
       
       if (oldData.titulo !== titulo) {
@@ -308,7 +314,7 @@ class Request {
         titulo, descripcion, tipo_solicitud_id, responsable_id, id
       ]);
       
-      // 💾 REGISTRAR EN HISTORIAL CON CAMBIOS DETALLADOS
+      // Registrar en historial con cambios detallados
       const comentarioDetallado = cambios.length > 0 
         ? `Solicitud editada: ${cambios.join(', ')}`
         : 'Solicitud editada sin cambios';
@@ -328,13 +334,14 @@ class Request {
       
     } catch (error) {
       await client.query('ROLLBACK');
+      console.error('❌ Error en Request.update:', error);
       throw error;
     } finally {
       client.release();
     }
   }
   
-  // Obtener historial de una solicitud
+  // ==================== OBTENER HISTORIAL DE SOLICITUD ====================
   static async getHistory(solicitudId) {
     try {
       const query = `
@@ -352,17 +359,20 @@ class Request {
       return result.rows;
       
     } catch (error) {
+      console.error('❌ Error en Request.getHistory:', error);
       throw error;
     }
   }
   
-  // Obtener estadísticas
+  // ==================== OBTENER ESTADÍSTICAS ====================
   static async getStats(userId, rol) {
     try {
       let query;
       let params = [];
       
-      if (rol === 'admin') {
+      // ✅ CORRECCIÓN: Usar roles en español
+      if (rol === ROLES.ADMIN) {
+        // Admin ve todas las solicitudes
         query = `
           SELECT 
             COUNT(*) FILTER (WHERE estado = 'pendiente') as pendientes,
@@ -371,7 +381,8 @@ class Request {
             COUNT(*) as total
           FROM Solicitudes
         `;
-      } else if (rol === 'aprobador') {
+      } else if ([ROLES.HR, ROLES.TECH_LEAD].includes(rol)) {
+        // HR y Tech Lead ven solicitudes asignadas a ellos
         query = `
           SELECT 
             COUNT(*) FILTER (WHERE estado = 'pendiente') as pendientes,
@@ -383,6 +394,7 @@ class Request {
         `;
         params = [userId];
       } else {
+        // Colaboradores ven solo sus solicitudes
         query = `
           SELECT 
             COUNT(*) FILTER (WHERE estado = 'pendiente') as pendientes,
@@ -396,9 +408,13 @@ class Request {
       }
       
       const result = await pool.query(query, params);
+      
+      console.log('📊 Stats obtenidas:', { userId, rol, stats: result.rows[0] });
+      
       return result.rows[0];
       
     } catch (error) {
+      console.error('❌ Error en Request.getStats:', error);
       throw error;
     }
   }
