@@ -1,15 +1,18 @@
 const Request = require('../models/Request');
 const RequestType = require('../models/RequestType');
 const User = require('../models/User');
+const { ROLES } = require('../models/User');
 const Notification = require('../models/Notification');
 
-// Crear solicitud
+// ==================== CREAR SOLICITUD ====================
 exports.createRequest = async (req, res) => {
   try {
     const { titulo, descripcion, tipo_solicitud_id, responsable_id } = req.body;
-    const solicitante_id = req.user.id; // ✅ CORREGIDO
+    const solicitante_id = req.user.id;
     
-    // Validar que el responsable exista y sea aprobador
+    console.log('🔵 Creando solicitud:', { solicitante_id, responsable_id, titulo });
+    
+    // Validar que el responsable exista y sea gestor (Admin o HR)
     const responsable = await User.findById(responsable_id);
     if (!responsable) {
       return res.status(404).json({
@@ -18,10 +21,11 @@ exports.createRequest = async (req, res) => {
       });
     }
     
-    if (!['aprobador', 'admin'].includes(responsable.rol)) {
+    // ✅ CORRECCIÓN: Usar roles en español
+    if (![ROLES.ADMIN, ROLES.HR].includes(responsable.rol)) {
       return res.status(400).json({
         success: false,
-        message: 'El usuario seleccionado no es un aprobador'
+        message: 'El usuario seleccionado no es un gestor válido'
       });
     }
     
@@ -42,11 +46,13 @@ exports.createRequest = async (req, res) => {
       responsable_id
     });
     
-    // 🔔 CREAR NOTIFICACIONES PARA TODOS LOS INVOLUCRADOS
+    console.log('✅ Solicitud creada:', solicitud.id);
+    
+    // 🔔 Crear notificaciones
     try {
       const solicitante = await User.findById(solicitante_id);
       
-      // 1️⃣ Notificación para el RESPONSABLE (aprobador asignado)
+      // Notificación para el responsable
       await Notification.create({
         usuario_id: responsable_id,
         solicitud_id: solicitud.id,
@@ -54,7 +60,7 @@ exports.createRequest = async (req, res) => {
         mensaje: `${solicitante.nombre} ha creado una nueva solicitud: "${titulo}" que requiere tu aprobación`
       });
       
-      // 2️⃣ Notificación para el SOLICITANTE (confirmación de envío)
+      // Notificación para el solicitante
       await Notification.create({
         usuario_id: solicitante_id,
         solicitud_id: solicitud.id,
@@ -62,14 +68,13 @@ exports.createRequest = async (req, res) => {
         mensaje: `Tu solicitud "${titulo}" ha sido enviada y está pendiente de aprobación`
       });
       
-      // 3️⃣ Notificación para TODOS LOS ADMINISTRADORES
-      const admins = await User.getAdmins(); // Obtener todos los admins
+      // Notificar a todos los administradores
+      const managers = await User.getManagers();
       
-      for (const admin of admins) {
-        // No enviar notificación al admin si él mismo es el responsable
-        if (admin.id !== responsable_id) {
+      for (const manager of managers) {
+        if (manager.id !== responsable_id) {
           await Notification.create({
-            usuario_id: admin.id,
+            usuario_id: manager.id,
             solicitud_id: solicitud.id,
             tipo: 'pendiente',
             mensaje: `Nueva solicitud creada por ${solicitante.nombre}: "${titulo}" - Asignada a ${responsable.nombre}`
@@ -78,7 +83,7 @@ exports.createRequest = async (req, res) => {
       }
       
     } catch (notifError) {
-      console.error('Error al crear notificaciones:', notifError);
+      console.error('⚠️ Error al crear notificaciones:', notifError);
     }
     
     res.status(201).json({
@@ -88,7 +93,7 @@ exports.createRequest = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al crear solicitud:', error);
+    console.error('❌ Error al crear solicitud:', error);
     res.status(500).json({
       success: false,
       message: 'Error al crear solicitud'
@@ -96,10 +101,10 @@ exports.createRequest = async (req, res) => {
   }
 };
 
-// Obtener solicitudes
+// ==================== OBTENER SOLICITUDES ====================
 exports.getRequests = async (req, res) => {
   try {
-    const userId = req.user.id; // ✅ CORREGIDO
+    const userId = req.user.id;
     const user = await User.findById(userId);
     
     if (!user) {
@@ -110,6 +115,8 @@ exports.getRequests = async (req, res) => {
     }
     
     const { estado, limit, offset } = req.query;
+    
+    console.log('🔍 Obteniendo solicitudes para:', { userId, rol: user.rol });
     
     const result = await Request.getAll({
       userId,
@@ -125,7 +132,7 @@ exports.getRequests = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al obtener solicitudes:', error);
+    console.error('❌ Error al obtener solicitudes:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener solicitudes'
@@ -133,11 +140,11 @@ exports.getRequests = async (req, res) => {
   }
 };
 
-// Obtener solicitud por ID
+// ==================== OBTENER SOLICITUD POR ID ====================
 exports.getRequestById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id; // ✅ CORREGIDO
+    const userId = req.user.id;
     const user = await User.findById(userId);
     
     if (!user) {
@@ -157,7 +164,7 @@ exports.getRequestById = async (req, res) => {
     }
     
     // Verificar permisos
-    const canView = user.rol === 'admin' || 
+    const canView = user.rol === ROLES.ADMIN || 
                     solicitud.solicitante_id === userId || 
                     solicitud.responsable_id === userId;
     
@@ -180,7 +187,7 @@ exports.getRequestById = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al obtener solicitud:', error);
+    console.error('❌ Error al obtener solicitud:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener solicitud'
@@ -188,12 +195,12 @@ exports.getRequestById = async (req, res) => {
   }
 };
 
-// 📝 NUEVO: Actualizar solicitud (editar)
+// ==================== ACTUALIZAR SOLICITUD ====================
 exports.updateRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { titulo, descripcion, tipo_solicitud_id, responsable_id } = req.body;
-    const userId = req.user.id; // ✅ CORREGIDO
+    const userId = req.user.id;
     const user = await User.findById(userId);
     
     if (!user) {
@@ -231,7 +238,8 @@ exports.updateRequest = async (req, res) => {
     // Validar responsable si se cambió
     if (responsable_id && responsable_id !== solicitud.responsable_id) {
       const responsable = await User.findById(responsable_id);
-      if (!responsable || !['aprobador', 'admin'].includes(responsable.rol)) {
+      // ✅ CORRECCIÓN: Usar roles en español
+      if (!responsable || ![ROLES.ADMIN, ROLES.HR].includes(responsable.rol)) {
         return res.status(400).json({
           success: false,
           message: 'El responsable seleccionado no es válido'
@@ -265,7 +273,7 @@ exports.updateRequest = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al actualizar solicitud:', error);
+    console.error('❌ Error al actualizar solicitud:', error);
     res.status(500).json({
       success: false,
       message: 'Error al actualizar solicitud'
@@ -273,12 +281,12 @@ exports.updateRequest = async (req, res) => {
   }
 };
 
-// Actualizar estado de solicitud
+// ==================== ACTUALIZAR ESTADO ====================
 exports.updateRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { estado, comentario } = req.body;
-    const userId = req.user.id; // ✅ CORREGIDO
+    const userId = req.user.id;
     const user = await User.findById(userId);
     
     if (!user) {
@@ -297,8 +305,9 @@ exports.updateRequestStatus = async (req, res) => {
       });
     }
     
-    // Verificar permisos
-    const canUpdate = user.rol === 'admin' || solicitud.responsable_id === userId;
+    // ✅ CORRECCIÓN: Usar roles en español
+    const canUpdate = [ROLES.ADMIN, ROLES.HR].includes(user.rol) || 
+                      solicitud.responsable_id === userId;
     
     if (!canUpdate) {
       return res.status(403).json({
@@ -328,7 +337,7 @@ exports.updateRequestStatus = async (req, res) => {
       usuario_id: userId
     });
     
-    // 🔔 CREAR NOTIFICACIONES PARA TODOS
+    // 🔔 Crear notificaciones
     try {
       let mensaje = '';
       let tipo = estado;
@@ -345,7 +354,7 @@ exports.updateRequestStatus = async (req, res) => {
         }
       }
       
-      // 1️⃣ Notificación para el SOLICITANTE
+      // Notificar al solicitante
       await Notification.create({
         usuario_id: solicitud.solicitante_id,
         solicitud_id: solicitud.id,
@@ -353,14 +362,13 @@ exports.updateRequestStatus = async (req, res) => {
         mensaje: mensaje
       });
       
-      // 2️⃣ Notificaciones para TODOS LOS ADMINISTRADORES
-      const admins = await User.getAdmins();
+      // Notificar a administradores
+      const managers = await User.getManagers();
       
-      for (const admin of admins) {
-        // No enviar notificación al admin que aprobó/rechazó
-        if (admin.id !== userId) {
+      for (const manager of managers) {
+        if (manager.id !== userId) {
           await Notification.create({
-            usuario_id: admin.id,
+            usuario_id: manager.id,
             solicitud_id: solicitud.id,
             tipo: tipo,
             mensaje: `La solicitud "${solicitud.titulo}" ha sido ${estado} por ${user.nombre}`
@@ -369,7 +377,7 @@ exports.updateRequestStatus = async (req, res) => {
       }
       
     } catch (notifError) {
-      console.error('Error al crear notificación:', notifError);
+      console.error('⚠️ Error al crear notificación:', notifError);
     }
     
     res.status(200).json({
@@ -379,7 +387,7 @@ exports.updateRequestStatus = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al actualizar solicitud:', error);
+    console.error('❌ Error al actualizar solicitud:', error);
     res.status(500).json({
       success: false,
       message: 'Error al actualizar solicitud'
@@ -387,10 +395,10 @@ exports.updateRequestStatus = async (req, res) => {
   }
 };
 
-// Obtener estadísticas
+// ==================== OBTENER ESTADÍSTICAS ====================
 exports.getStats = async (req, res) => {
   try {
-    const userId = req.user.id; // ✅ CORREGIDO
+    const userId = req.user.id;
     const user = await User.findById(userId);
     
     if (!user) {
@@ -400,6 +408,8 @@ exports.getStats = async (req, res) => {
       });
     }
     
+    console.log('📊 Obteniendo stats para:', { userId, rol: user.rol });
+    
     const stats = await Request.getStats(userId, user.rol);
     
     res.status(200).json({
@@ -408,7 +418,7 @@ exports.getStats = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
+    console.error('❌ Error al obtener estadísticas:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas'
@@ -416,7 +426,7 @@ exports.getStats = async (req, res) => {
   }
 };
 
-// Obtener tipos de solicitud
+// ==================== OBTENER TIPOS DE SOLICITUD ====================
 exports.getRequestTypes = async (req, res) => {
   try {
     const types = await RequestType.getAll();
@@ -427,7 +437,7 @@ exports.getRequestTypes = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error al obtener tipos:', error);
+    console.error('❌ Error al obtener tipos:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener tipos de solicitud'
@@ -435,21 +445,24 @@ exports.getRequestTypes = async (req, res) => {
   }
 };
 
-// Obtener aprobadores
+// ==================== OBTENER GESTORES (APROBADORES) ====================
+// ✅ CORRECCIÓN: Ahora usa getManagers() que retorna Admin + HR
 exports.getApprovers = async (req, res) => {
   try {
-    const approvers = await User.getApprovers();
+    console.log('👥 Obteniendo gestores (Admin + HR)');
+    
+    const managers = await User.getManagers();
     
     res.status(200).json({
       success: true,
-      data: approvers
+      data: managers
     });
     
   } catch (error) {
-    console.error('Error al obtener aprobadores:', error);
+    console.error('❌ Error al obtener gestores:', error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener aprobadores'
+      message: 'Error al obtener gestores'
     });
   }
 };
