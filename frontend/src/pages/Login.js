@@ -165,11 +165,11 @@ const Login = () => {
           
           <div className="auth-welcome">
             <h2 className="auth-welcome-title">Bienvenido</h2>
-            <p className="auth-welcome-subtitle">Sistema de Servicios y Aprobaciones</p>
+            <p className="auth-welcome-subtitle">Sistema de Onboarding de Colaboradores</p>
             <div className="auth-welcome-divider"></div>
             <p className="auth-welcome-description">
-              Gestiona tus solicitudes de manera eficiente y segura
-            </p>
+                  Gestiona el onboarding de nuevos colaboradores de manera eficiente    
+          </p>
           </div>
 
           <div className="auth-features">
@@ -179,7 +179,7 @@ const Login = () => {
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span>Aprobaciones en tiempo real</span>
+              <span>Seguimiento en tiempo real</span>
             </div>
             <div className="auth-feature">
               <div className="auth-feature-icon">
@@ -187,7 +187,7 @@ const Login = () => {
                   <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <span>Seguridad garantizada</span>
+              <span>Gestión centralizada</span>
             </div>
             <div className="auth-feature">
               <div className="auth-feature-icon">
@@ -195,7 +195,7 @@ const Login = () => {
                   <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <span>Reportes detallados</span>
+              <span>Alertas automáticas</span>
             </div>
           </div>
         </div>
