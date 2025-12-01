@@ -2,6 +2,17 @@ const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
+// 🎯 DEFINICIÓN DE ROLES DEL SISTEMA
+const ROLES = {
+  ADMIN: 'Administrador',
+  HR: 'Recursos Humanos',
+  TECH_LEAD: 'Líder Técnico',
+  EMPLOYEE: 'Colaborador'
+};
+
+// 🎯 ROLES VÁLIDOS (para validación)
+const VALID_ROLES = Object.values(ROLES);
+
 class User {
   
   // ==================== NORMALIZAR EMAIL ====================
@@ -10,10 +21,27 @@ class User {
     return email.toLowerCase().trim();
   }
   
+  // ==================== VALIDAR ROL ====================
+  static validateRole(rol) {
+    if (!rol) return ROLES.EMPLOYEE; // Rol por defecto
+    
+    // Verificar si el rol es válido
+    if (VALID_ROLES.includes(rol)) {
+      return rol;
+    }
+    
+    // Si no es válido, retornar rol por defecto
+    console.warn(`⚠️ Rol inválido recibido: ${rol}. Asignando rol por defecto.`);
+    return ROLES.EMPLOYEE;
+  }
+  
   // ==================== CREAR USUARIO ====================
   static async create(userData) {
     try {
-      const { nombre, email, password, rol = 'usuario' } = userData;
+      const { nombre, email, password, rol } = userData;
+
+      // Validar rol antes de crear usuario
+      const validatedRole = this.validateRole(rol);
 
       // Hashear contraseña
       const salt = await bcrypt.genSalt(12);
@@ -29,10 +57,10 @@ class User {
         nombre,
         this.normalizeEmail(email),
         hashedPassword,
-        rol
+        validatedRole
       ]);
 
-      console.log(`✅ Usuario creado: ${result.rows[0].email}`);
+      console.log(`✅ Usuario creado: ${result.rows[0].email} - Rol: ${result.rows[0].rol}`);
       return result.rows[0];
 
     } catch (error) {
@@ -217,27 +245,68 @@ class User {
     }
   }
 
-  // ==================== OBTENER APROBADORES ====================
-  // 🎯 ESTE ES EL MÉTODO QUE FALTABA Y CAUSABA EL ERROR 500
-  static async getApprovers() {
+  // ==================== OBTENER USUARIOS POR ROL ====================
+  // 🎯 ACTUALIZADO: Ahora funciona con los nuevos roles
+  static async getUsersByRole(roles) {
     try {
+      // Si se pasa un string, convertirlo a array
+      const roleArray = Array.isArray(roles) ? roles : [roles];
+      
+      // Validar que los roles sean válidos
+      const validatedRoles = roleArray.filter(rol => VALID_ROLES.includes(rol));
+      
+      if (validatedRoles.length === 0) {
+        throw new Error('No se proporcionaron roles válidos');
+      }
+
       const query = `
         SELECT id, nombre, email, rol
         FROM Usuarios_RI 
-        WHERE rol IN ('aprobador', 'admin')
+        WHERE rol = ANY($1)
           AND activo = true
         ORDER BY nombre ASC
       `;
 
-      const result = await pool.query(query);
+      const result = await pool.query(query, [validatedRoles]);
       
-      console.log(`✅ Obtenidos ${result.rows.length} aprobadores`);
+      console.log(`✅ Obtenidos ${result.rows.length} usuarios con roles: ${validatedRoles.join(', ')}`);
       return result.rows;
       
     } catch (error) {
-      console.error('Error en getApprovers:', error);
-      throw new Error(`Error al obtener aprobadores: ${error.message}`);
+      console.error('Error en getUsersByRole:', error);
+      throw new Error(`Error al obtener usuarios: ${error.message}`);
     }
+  }
+
+  // ==================== OBTENER ADMINS Y HR (GESTORES) ====================
+  // 🎯 NUEVO: Para obtener usuarios que pueden gestionar colaboradores
+  static async getManagers() {
+    try {
+      return await this.getUsersByRole([ROLES.ADMIN, ROLES.HR]);
+    } catch (error) {
+      console.error('Error en getManagers:', error);
+      throw new Error(`Error al obtener gestores: ${error.message}`);
+    }
+  }
+
+  // ==================== OBTENER LÍDERES TÉCNICOS ====================
+  // 🎯 NUEVO: Para asignación de onboardings técnicos
+  static async getTechLeads() {
+    try {
+      return await this.getUsersByRole([ROLES.TECH_LEAD, ROLES.ADMIN]);
+    } catch (error) {
+      console.error('Error en getTechLeads:', error);
+      throw new Error(`Error al obtener líderes técnicos: ${error.message}`);
+    }
+  }
+
+  // ==================== VERIFICAR PERMISOS ====================
+  // 🎯 NUEVO: Para verificar si un usuario tiene permisos
+  static hasPermission(userRole, requiredRoles) {
+    if (!Array.isArray(requiredRoles)) {
+      requiredRoles = [requiredRoles];
+    }
+    return requiredRoles.includes(userRole);
   }
 
   // ==================== LIMPIAR TOKENS EXPIRADOS ====================
@@ -266,4 +335,7 @@ class User {
   }
 }
 
+// Exportar clase y constantes
 module.exports = User;
+module.exports.ROLES = ROLES;
+module.exports.VALID_ROLES = VALID_ROLES;

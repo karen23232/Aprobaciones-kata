@@ -1,35 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const { registerValidator, loginValidator, handleValidationErrors } = require('../utils/validators');
-const { protect } = require('../middlewares/auth');
+const {
+  register,
+  login,
+  getProfile,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken,
+  getUsersByRole,
+  getManagers,
+  getTechLeads
+} = require('../controllers/authController');
+const { protect, isAdmin } = require('../middlewares/auth');
 
-// ========== RUTAS PÚBLICAS ==========
+// ==================== RUTAS PÚBLICAS ====================
+router.post('/register', register);
+router.post('/login', login);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
+router.get('/verify-reset-token/:token', verifyResetToken);
 
-// Autenticación básica
-router.post(
-  '/register',
-  registerValidator,
-  handleValidationErrors,
-  authController.register
-);
+// ==================== RUTAS PROTEGIDAS ====================
+router.get('/profile', protect, getProfile);
 
-router.post(
-  '/login',
-  loginValidator,
-  handleValidationErrors,
-  authController.login
-);
-
-// Recuperación de contraseña
-router.post('/forgot-password', authController.forgotPassword);
-
-router.post('/reset-password', authController.resetPassword);
-
-router.get('/verify-reset-token/:token', authController.verifyResetToken);
-
-// ========== RUTAS PROTEGIDAS ==========
-
-router.get('/profile', protect, authController.getProfile);
+// ==================== RUTAS PARA OBTENER USUARIOS POR ROL ====================
+// 🎯 NUEVAS: Para filtrar usuarios por rol
+router.get('/users/role/:rol', protect, getUsersByRole);
+router.get('/users/managers', protect, getManagers);
+router.get('/users/tech-leads', protect, getTechLeads);
 
 module.exports = router;

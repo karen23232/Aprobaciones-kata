@@ -15,7 +15,7 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    rol: 'solicitante',
+    rol: 'Colaborador', // 🔄 CAMBIADO: Rol por defecto
   });
 
   const [errors, setErrors] = useState({});
@@ -210,7 +210,7 @@ const Register = () => {
                   value={formData.nombre}
                   onChange={handleChange}
                   className={`form-input-new ${errors.nombre ? 'error' : ''}`}
-                  placeholder="Juan Pérez"
+                  placeholder="Juan Pérez López"
                   autoComplete="name"
                 />
               </div>
@@ -239,6 +239,7 @@ const Register = () => {
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
+            {/* 🎯 NUEVO DROPDOWN DE ROLES */}
             <div className="form-group-new">
               <label htmlFor="rol" className="form-label-new">
                 Rol
@@ -254,11 +255,19 @@ const Register = () => {
                   onChange={handleChange}
                   className="form-input-new form-select-new"
                 >
-                  <option value="solicitante">Solicitante</option>
-                  <option value="aprobador">Aprobador</option>
-                  <option value="admin">Administrador</option>
+                  <option value="Colaborador">Colaborador</option>
+                  <option value="Recursos Humanos">Recursos Humanos</option>
+                  <option value="Líder Técnico">Líder Técnico</option>
+                  <option value="Administrador">Administrador</option>
                 </select>
               </div>
+              {/* Descripción del rol seleccionado */}
+              <p className="form-help-text">
+                {formData.rol === 'Administrador' && '🔴 Control total del sistema de onboarding'}
+                {formData.rol === 'Recursos Humanos' && '🟡 Gestión de colaboradores y onboarding de bienvenida'}
+                {formData.rol === 'Líder Técnico' && '🔵 Gestión de onboardings técnicos y calendario'}
+                {formData.rol === 'Colaborador' && '🟢 Acceso a tu perfil y onboardings asignados'}
+              </p>
             </div>
 
             <div className="form-group-new">

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { ROLES, VALID_ROLES } = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendPasswordResetEmail } = require('../services/emailService');
 
@@ -22,6 +23,14 @@ const register = async (req, res) => {
       });
     }
 
+    // Validar rol (opcional, se asigna por defecto si no viene)
+    if (rol && !VALID_ROLES.includes(rol)) {
+      return res.status(400).json({
+        success: false,
+        message: `Rol inválido. Roles permitidos: ${VALID_ROLES.join(', ')}`
+      });
+    }
+
     // Verificar si el usuario ya existe
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
@@ -31,16 +40,18 @@ const register = async (req, res) => {
       });
     }
 
-    // Crear usuario
+    // Crear usuario (el modelo validará el rol)
     const user = await User.create({
       nombre,
       email,
       password,
-      rol: rol || 'usuario'
+      rol: rol || ROLES.EMPLOYEE // Rol por defecto: Colaborador
     });
 
     // Generar token
     const token = generateToken(user.id);
+
+    console.log(`✅ Usuario registrado: ${user.email} - Rol: ${user.rol}`);
 
     res.status(201).json({
       success: true,
@@ -107,6 +118,8 @@ const login = async (req, res) => {
     // Generar token
     const token = generateToken(user.id);
 
+    console.log(`✅ Login exitoso: ${user.email} - Rol: ${user.rol}`);
+
     res.status(200).json({
       success: true,
       message: 'Login exitoso',
@@ -164,7 +177,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-// ==================== FORGOT PASSWORD (ACTUALIZADO CON GMAIL) ====================
+// ==================== FORGOT PASSWORD ====================
 const forgotPassword = async (req, res) => {
   try {
     const { email, method } = req.body;
@@ -190,7 +203,6 @@ const forgotPassword = async (req, res) => {
     const result = await User.createPasswordResetToken(email);
 
     if (!result) {
-      // ❌ EMAIL NO EXISTE - Mensaje claro
       return res.status(404).json({
         success: false,
         message: '❌ Este email no está registrado. Por favor, regístrate primero para continuar.'
@@ -199,17 +211,18 @@ const forgotPassword = async (req, res) => {
 
     const { user, resetToken } = result;
 
-    // 🎯 MOSTRAR TOKEN EN CONSOLA DEL SERVIDOR (para desarrollo)
+    // Mostrar token en consola del servidor (para desarrollo)
     console.log('\n' + '='.repeat(60));
     console.log('🔐 TOKEN DE RECUPERACIÓN DE CONTRASEÑA');
     console.log('='.repeat(60));
     console.log(`Usuario: ${user.nombre} (${user.email})`);
+    console.log(`Rol: ${user.rol || 'No especificado'}`);
     console.log(`Token: ${resetToken}`);
     console.log(`Expira en: 1 hora`);
     console.log(`Método: ${method || 'email'}`);
     console.log('='.repeat(60) + '\n');
 
-    // ✅ DIFERENCIAR POR MÉTODO
+    // Diferenciar por método
     if (method === 'token') {
       // MÉTODO TOKEN: Devolver token inmediatamente (solo desarrollo)
       return res.status(200).json({
@@ -233,7 +246,6 @@ const forgotPassword = async (req, res) => {
       } catch (emailError) {
         console.error('❌ Error al enviar email:', emailError);
         
-        // Si falla el envío de email, devolver el token como fallback
         return res.status(200).json({
           success: true,
           message: '⚠️ No se pudo enviar el email. Usa el token mostrado en la consola del servidor.',
@@ -287,7 +299,7 @@ const resetPassword = async (req, res) => {
     // Actualizar contraseña
     await User.updatePassword(user.id, newPassword);
 
-    console.log(`✅ Contraseña actualizada para: ${user.email}`);
+    console.log(`✅ Contraseña actualizada para: ${user.email} (${user.rol})`);
 
     res.status(200).json({
       success: true,
@@ -341,6 +353,78 @@ const verifyResetToken = async (req, res) => {
   }
 };
 
+// ==================== OBTENER USUARIOS POR ROL ====================
+// 🎯 NUEVO: Endpoint para obtener usuarios filtrados por rol
+const getUsersByRole = async (req, res) => {
+  try {
+    const { rol } = req.params;
+
+    if (!VALID_ROLES.includes(rol)) {
+      return res.status(400).json({
+        success: false,
+        message: `Rol inválido. Roles válidos: ${VALID_ROLES.join(', ')}`
+      });
+    }
+
+    const users = await User.getUsersByRole(rol);
+
+    res.status(200).json({
+      success: true,
+      data: users,
+      count: users.length
+    });
+
+  } catch (error) {
+    console.error('Error en getUsersByRole:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al obtener usuarios'
+    });
+  }
+};
+
+// ==================== OBTENER GESTORES ====================
+// 🎯 NUEVO: Para obtener Admins y RRHH
+const getManagers = async (req, res) => {
+  try {
+    const managers = await User.getManagers();
+
+    res.status(200).json({
+      success: true,
+      data: managers,
+      count: managers.length
+    });
+
+  } catch (error) {
+    console.error('Error en getManagers:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al obtener gestores'
+    });
+  }
+};
+
+// ==================== OBTENER LÍDERES TÉCNICOS ====================
+// 🎯 NUEVO: Para obtener Tech Leads
+const getTechLeads = async (req, res) => {
+  try {
+    const techLeads = await User.getTechLeads();
+
+    res.status(200).json({
+      success: true,
+      data: techLeads,
+      count: techLeads.length
+    });
+
+  } catch (error) {
+    console.error('Error en getTechLeads:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al obtener líderes técnicos'
+    });
+  }
+};
+
 // ==================== EXPORTAR TODOS LOS MÉTODOS ====================
 module.exports = {
   register,
@@ -348,5 +432,8 @@ module.exports = {
   getProfile,
   forgotPassword,
   resetPassword,
-  verifyResetToken
+  verifyResetToken,
+  getUsersByRole,
+  getManagers,
+  getTechLeads
 };
