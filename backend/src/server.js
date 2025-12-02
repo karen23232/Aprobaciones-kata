@@ -8,21 +8,50 @@ const { setupCronJobs } = require('./utils/cronJobs');
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const alertRoutes = require('./routes/Alertroutes');
-// Si mantienes notificaciones del sistema anterior:
-// const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
-// Middlewares
-app.use(cors());
+// ==================== CONFIGURACIÓN CORS ====================
+// IMPORTANTE: Esta configuración debe ir ANTES de cualquier ruta
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Lista de orígenes permitidos
+    const allowedOrigins = [
+      'https://aprobaciones-kata-production.up.railway.app',
+      'https://aprobaciones-kata-f1j2cde47.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5173'
+    ];
+    
+    // Permitir peticiones sin origin (como Postman, o misma origen)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Request-Id'],
+  maxAge: 86400, // 24 horas
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// Manejar preflight requests explícitamente
+app.options('*', cors(corsOptions));
+
+// ==================== MIDDLEWARES ====================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas
+// ==================== RUTAS ====================
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/alerts', alertRoutes);
-// app.use('/api/notifications', notificationRoutes); // Si lo mantienes
 
 // Ruta de prueba
 app.get('/', (req, res) => {
@@ -75,9 +104,8 @@ const startServer = async () => {
     console.log('✅ Conexión a la base de datos establecida correctamente');
 
     // Sincronizar modelos con la base de datos
-    // NOTA: En producción usa migraciones en lugar de sync()
     if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true }); // alter modifica las tablas existentes
+      await sequelize.sync({ alter: true });
       console.log('✅ Modelos sincronizados con la base de datos');
     }
 
@@ -90,6 +118,7 @@ const startServer = async () => {
       console.log('🚀 Servidor corriendo en puerto', PORT);
       console.log('🌍 Entorno:', process.env.NODE_ENV || 'development');
       console.log('📅 Fecha de inicio:', new Date().toLocaleString('es-CO'));
+      console.log('🔐 CORS configurado para:', corsOptions.origin);
     });
 
     // Manejo de cierre graceful
