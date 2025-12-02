@@ -5,7 +5,7 @@ import alertService from '../services/alertservice';
 import StatusBadge from '../components/Statusbadge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Modal from '../components/Modal';
-import '../styles/EmployeeDetail.css';
+import '../styles/Employeedetaill.css';
 
 const EmployeeDetail = () => {
   const { id } = useParams();

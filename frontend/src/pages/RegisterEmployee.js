@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeservice';
 import LoadingSpinner from '../components/LoadingSpinner';
-import '../styles/RegisterEmployee.css';
+import '../styles/Registeremployee.css';
 
 const RegisterEmployee = () => {
   const navigate = useNavigate();

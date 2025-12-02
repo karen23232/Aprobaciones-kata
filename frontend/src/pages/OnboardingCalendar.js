@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeservice';
 import StatusBadge from '../components/Statusbadge';
 import LoadingSpinner from '../components/LoadingSpinner';
-import '../styles/OnboardingCalendar.css';
+import '../styles/Onboardingcalendar.css';
 
 const OnboardingCalendar = () => {
   const navigate = useNavigate();
