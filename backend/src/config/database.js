@@ -1,25 +1,31 @@
-const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Normalizamos la URL por si Railway la envía como "postgresql://"
-const rawConnectionString = process.env.DATABASE_URL;
-const normalizedConnectionString = rawConnectionString.replace('postgresql://', 'postgres://');
-
-const pool = new Pool({
-  connectionString: normalizedConnectionString,
-  ssl: {
-    rejectUnauthorized: false, // Requerido por Railway
+// Railway proporciona DATABASE_URL automáticamente
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
   },
+  logging: false,
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 });
 
-// Test connection
-pool.on('connect', () => {
-  console.log('✅ Database connected successfully');
-});
+// Test de conexión
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Database connected successfully');
+  })
+  .catch(err => {
+    console.error('❌ Unable to connect to database:', err);
+  });
 
-pool.on('error', (err) => {
-  console.error('❌ Unexpected database error:', err);
-  process.exit(-1);
-});
-
-module.exports = pool;
+  module.exports = sequelize;
