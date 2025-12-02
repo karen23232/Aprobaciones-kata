@@ -1,30 +1,40 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ProtectedRoute from './components/ProtectedRoute';
+
+// Componentes de autenticación
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import RequestsList from './pages/RequestsList';
-import CreateRequest from './pages/CreateRequest';
-import RequestDetail from './pages/RequestDetail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+
+// Componentes protegidos
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
+
+// Componentes de empleados (NUEVOS)
+import RegisterEmployee from './pages/RegisterEmployee';
+import EmployeesDashboard from './pages/EmployeesDashboard';
+import EmployeeDetail from './pages/EmployeeDetail';
+import OnboardingCalendar from './pages/OnboardingCalendar';
+
+// Estilos globales
 import './styles/global.css';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            {/* Rutas públicas */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+            {/* Rutas protegidas */}
             <Route
               path="/dashboard"
               element={
@@ -33,39 +43,52 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
+            {/* Rutas de empleados */}
             <Route
-              path="/requests"
+              path="/dashboard/employees"
               element={
                 <ProtectedRoute>
-                  <RequestsList />
+                  <EmployeesDashboard />
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
-              path="/requests/new"
+              path="/dashboard/employees/new"
               element={
                 <ProtectedRoute>
-                  <CreateRequest />
+                  <RegisterEmployee />
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
-              path="/requests/:id"
+              path="/dashboard/employees/:id"
               element={
                 <ProtectedRoute>
-                  <RequestDetail />
+                  <EmployeeDetail />
                 </ProtectedRoute>
               }
             />
-            
-            <Route path="*" element={<Navigate to="/login" replace />} />
+
+            {/* Ruta del calendario */}
+            <Route
+              path="/dashboard/calendar"
+              element={
+                <ProtectedRoute>
+                  <OnboardingCalendar />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Redirecciones */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
 

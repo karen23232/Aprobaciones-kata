@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import requestService from '../services/requestService';
-import notificationService from '../services/notificationService';
+import employeeService from '../services/employeeservice';
 import StatsCard from '../components/StatsCard';
 import Card from '../components/Card';
-import Badge from '../components/Badge';
 import LoadingSpinner from '../components/LoadingSpinner';
-import EmptyState from '../components/EmptyState';
 import ThemeToggle from '../components/ThemeToggle';
-import { formatRelativeTime, getStatusColor, getStatusIcon } from '../utils/formatters';
 import '../styles/Dashboard.css';
 
 // Logo del banco
@@ -20,43 +16,18 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
 
   const [stats, setStats] = useState(null);
-  const [recentRequests, setRecentRequests] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showStats, setShowStats] = useState(false);
+  const [showStats, setShowStats] = useState(true); // Mostrar por defecto
 
-  // 🔔 POLLING: Cargar datos iniciales y configurar actualización automática
   useEffect(() => {
     loadDashboardData();
-    
-    // 🔔 Refrescar notificaciones cada 30 segundos
-    const notificationInterval = setInterval(() => {
-      refreshNotifications();
-    }, 30000); // 30 segundos
-    
-    // Limpiar intervalo al desmontar el componente
-    return () => {
-      clearInterval(notificationInterval);
-    };
   }, []);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-
-      const [statsData, requestsData, notificationsData, countData] = await Promise.all([
-        requestService.getStats(),
-        requestService.getAll({ limit: 5 }),
-        notificationService.getAll(5),
-        notificationService.getUnreadCount(),
-      ]);
-
+      const statsData = await employeeService.getDashboardStats();
       setStats(statsData.data);
-      setRecentRequests(requestsData.data.solicitudes);
-      setNotifications(notificationsData.data);
-      setUnreadCount(countData.data.count);
     } catch (error) {
       console.error('Error al cargar dashboard:', error);
     } finally {
@@ -64,79 +35,9 @@ const Dashboard = () => {
     }
   };
 
-  // 🔔 NUEVA FUNCIÓN: Refrescar solo notificaciones (más eficiente)
-  const refreshNotifications = async () => {
-    try {
-      const [notificationsData, countData] = await Promise.all([
-        notificationService.getAll(5),
-        notificationService.getUnreadCount(),
-      ]);
-      
-      setNotifications(notificationsData.data);
-      setUnreadCount(countData.data.count);
-      
-      // Log opcional para verificar que está funcionando (puedes quitarlo después)
-      console.log('🔔 Notificaciones actualizadas:', countData.data.count, 'sin leer');
-    } catch (error) {
-      console.error('Error al refrescar notificaciones:', error);
-      // No mostrar error al usuario, solo registrar en consola
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/login');
-  };
-
-  const handleNotificationClick = async (notification) => {
-    try {
-      if (!notification.leida) {
-        await notificationService.markAsRead(notification.id);
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-      if (notification.solicitud_id) {
-        navigate(`/requests/${notification.solicitud_id}`);
-      }
-      setShowNotifications(false);
-    } catch (error) {
-      console.error('Error al marcar notificación:', error);
-    }
-  };
-
-  const handleMarkAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead();
-      setNotifications(prev => prev.map(n => ({ ...n, leida: true })));
-      setUnreadCount(0);
-    } catch (error) {
-      console.error('Error al marcar notificaciones:', error);
-    }
-  };
-
-  const getNotificationIcon = (tipo) => {
-    switch (tipo) {
-      case 'pendiente':
-        return '⏳';
-      case 'aprobado':
-        return '✅';
-      case 'rechazado':
-        return '❌';
-      default:
-        return '🔔';
-    }
-  };
-
-  const getNotificationClass = (tipo) => {
-    switch (tipo) {
-      case 'pendiente':
-        return 'notification-pending';
-      case 'aprobado':
-        return 'notification-approved';
-      case 'rechazado':
-        return 'notification-rejected';
-      default:
-        return '';
-    }
   };
 
   if (loading) {
@@ -150,72 +51,18 @@ const Dashboard = () => {
         <div className="header-content">
           <div className="header-left">
             <img src={BancoLogo} alt="Banco de Bogotá" className="bank-logo" />
-            <h1>Sistema de Aprobaciones</h1>
+            <h1>Sistema de Gestión de Onboarding</h1>
           </div>
           
           <div className="header-right">
-            {/* 🌙 BOTÓN DE TEMA - NUEVO */}
+            {/* 🌙 Botón de Tema */}
             <ThemeToggle />
-
-            {/* Notificaciones */}
-            <div className="notifications-wrapper">
-              <button
-                className="notification-btn"
-                onClick={() => setShowNotifications(!showNotifications)}
-                aria-label="Notificaciones"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-                {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
-              </button>
-
-              {showNotifications && (
-                <div className="notifications-dropdown">
-                  <div className="notifications-header">
-                    <h3>Notificaciones</h3>
-                    {unreadCount > 0 && (
-                      <button onClick={handleMarkAllAsRead} className="mark-all-btn">
-                        Marcar todas como leídas
-                      </button>
-                    )}
-                  </div>
-                  <div className="notifications-list">
-                    {notifications.length === 0 ? (
-                      <div className="no-notifications">
-                        <p>No tienes notificaciones</p>
-                      </div>
-                    ) : (
-                      notifications.map(notification => (
-                        <div
-                          key={notification.id}
-                          className={`notification-item ${notification.leida ? 'read' : 'unread'} ${getNotificationClass(notification.tipo)}`}
-                          onClick={() => handleNotificationClick(notification)}
-                        >
-                          <div className="notification-icon">
-                            {getNotificationIcon(notification.tipo)}
-                          </div>
-                          <div className="notification-content">
-                            <p className="notification-message">{notification.mensaje}</p>
-                            <span className="notification-time">
-                              {formatRelativeTime(notification.created_at)}
-                            </span>
-                          </div>
-                          {!notification.leida && <div className="unread-dot"></div>}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* Usuario */}
             <div className="user-menu">
               <div className="user-info">
-                <span className="user-name">{user?.nombre}</span>
-                <span className="user-role">{user?.rol}</span>
+                <span className="user-name">{user?.nombre || user?.username}</span>
+                <span className="user-role">{user?.rol || 'Usuario'}</span>
               </div>
               <button onClick={handleLogout} className="btn btn-secondary">
                 Cerrar Sesión
@@ -225,15 +72,15 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content con fondo */}
+      {/* Main Content */}
       <main className="dashboard-main">
         {/* Bienvenida */}
         <div className="welcome-section">
-          <h2>¡Bienvenido, {user?.nombre}!</h2>
-          <p>Aquí puedes gestionar tus solicitudes de aprobación</p>
+          <h2>¡Bienvenido, {user?.nombre || user?.username}!</h2>
+          <p>Gestiona el onboarding de nuevos colaboradores</p>
         </div>
 
-        {/* 📊 BOTÓN PARA VER ESTADÍSTICAS */}
+        {/* 📊 Botón para Ver/Ocultar Estadísticas */}
         <button
           className={`stats-toggle-btn ${showStats ? 'active' : ''}`}
           onClick={() => setShowStats(!showStats)}
@@ -249,147 +96,212 @@ const Dashboard = () => {
           </svg>
         </button>
 
-        {/* Estadísticas - Solo se muestran si showStats es true */}
-        {showStats && (
+        {/* Estadísticas */}
+        {showStats && stats && (
           <div className="stats-grid">
             <StatsCard
-              title="Total Solicitudes"
-              value={stats?.total || 0}
+              title="Total Colaboradores"
+              value={stats.totalEmployees || 0}
               color="primary"
+              onClick={() => navigate('/dashboard/employees')}
+            />
+            <StatsCard
+              title="Onboarding Completado"
+              value={stats.bothCompleted || 0}
+              subtitle={`${stats.percentageComplete || 0}% del total`}
+              color="success"
+              onClick={() => navigate('/dashboard/employees?status=completed')}
             />
             <StatsCard
               title="Pendientes"
-              value={stats?.pendientes || 0}
+              value={stats.pending || 0}
               color="warning"
+              onClick={() => navigate('/dashboard/employees?status=pending')}
             />
             <StatsCard
-              title="Aprobadas"
-              value={stats?.aprobadas || 0}
-              color="success"
-            />
-            <StatsCard
-              title="Rechazadas"
-              value={stats?.rechazadas || 0}
-              color="danger"
+              title="Próximos 14 días"
+              value={stats.upcomingOnboardings || 0}
+              subtitle="Onboardings técnicos"
+              color="info"
+              onClick={() => navigate('/dashboard/calendar')}
             />
           </div>
         )}
 
-        {/* Acciones Rápidas - NUEVO DISEÑO CON CARDS GRANDES */}
+        {/* Acciones Rápidas */}
         <Card className="quick-actions">
           <h3>Acciones Rápidas</h3>
           <div className="actions-grid">
-            {/* Card 1: Nueva Solicitud */}
+            {/* Card 1: Nuevo Colaborador */}
             <div
               className="action-card action-card-primary"
-              onClick={() => navigate('/requests/new')}
+              onClick={() => navigate('/dashboard/employees/new')}
             >
               <div className="action-card-image">
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
                 </svg>
               </div>
               <div className="action-card-content">
-                <h4 className="action-card-title">Nueva Solicitud</h4>
-                <p className="action-card-description">Crea una nueva solicitud de aprobación</p>
+                <h4 className="action-card-title">Nuevo Colaborador</h4>
+                <p className="action-card-description">Registrar un nuevo colaborador en el sistema</p>
               </div>
             </div>
 
-            {/* Card 2: Ver Todas */}
+            {/* Card 2: Ver Colaboradores */}
             <div
               className="action-card action-card-secondary"
-              onClick={() => navigate('/requests')}
+              onClick={() => navigate('/dashboard/employees')}
             >
               <div className="action-card-image">
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
               <div className="action-card-content">
-                <h4 className="action-card-title">Ver Todas</h4>
-                <p className="action-card-description">Consulta todas tus solicitudes</p>
+                <h4 className="action-card-title">Ver Colaboradores</h4>
+                <p className="action-card-description">Consulta la lista completa de colaboradores</p>
               </div>
             </div>
 
-            {/* Card 3: Pendientes (solo para aprobadores) */}
-            {(user?.rol === 'aprobador' || user?.rol === 'admin') && (
-              <div
-                className="action-card action-card-accent"
-                onClick={() => navigate('/requests?estado=pendiente')}
-              >
-                <div className="action-card-image">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <div className="action-card-content">
-                  <h4 className="action-card-title">Pendientes de Aprobar</h4>
-                  <p className="action-card-description">Revisa y aprueba solicitudes</p>
-                </div>
+            {/* Card 3: Calendario */}
+            <div
+              className="action-card action-card-accent"
+              onClick={() => navigate('/dashboard/calendar')}
+            >
+              <div className="action-card-image">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
               </div>
-            )}
+              <div className="action-card-content">
+                <h4 className="action-card-title">Calendario</h4>
+                <p className="action-card-description">Ver calendario de onboardings técnicos</p>
+              </div>
+            </div>
           </div>
         </Card>
 
-        {/* Solicitudes Recientes */}
-        <Card>
-          <div className="section-header">
-            <h3>Solicitudes Recientes</h3>
-            <button
-              className="btn-text"
-              onClick={() => navigate('/requests')}
-            >
-              Ver todas →
-            </button>
-          </div>
-
-          {recentRequests.length === 0 ? (
-            <EmptyState
-              icon="📋"
-              title="No hay solicitudes"
-              description="Aún no tienes solicitudes creadas"
-              action={
-                <button
-                  className="btn btn-primary"
-                  onClick={() => navigate('/requests/new')}
-                >
-                  Crear primera solicitud
-                </button>
-              }
-            />
-          ) : (
-            <div className="requests-list">
-              {recentRequests.map(request => (
-                <div
-                  key={request.id}
-                  className="request-item"
-                  onClick={() => navigate(`/requests/${request.id}`)}
-                >
-                  <div className="request-main">
-                    <div className="request-header">
-                      <h4 className="request-title">{request.titulo}</h4>
-                      <Badge variant={getStatusColor(request.estado)}>
-                        {getStatusIcon(request.estado)} {request.estado}
-                      </Badge>
-                    </div>
-                    <p className="request-code">{request.codigo_unico}</p>
-                    <p className="request-type">{request.tipo_nombre}</p>
-                  </div>
-                  <div className="request-meta">
-                    <span className="request-time">
-                      {formatRelativeTime(request.created_at)}
-                    </span>
-                  </div>
+        {/* Detalles de Progreso - NUEVO */}
+        {stats && (
+          <Card>
+            <h3>📈 Progreso de Onboarding</h3>
+            <div className="progress-details">
+              <div className="progress-item">
+                <div className="progress-header">
+                  <span className="progress-label">
+                    <span className="progress-icon">👋</span>
+                    Onboarding General
+                  </span>
+                  <span className="progress-value">
+                    {stats.generalCompleted} / {stats.totalEmployees}
+                  </span>
                 </div>
-              ))}
+                <div className="progress-bar-container">
+                  <div 
+                    className="progress-bar progress-bar-success"
+                    style={{ 
+                      width: `${stats.totalEmployees > 0 
+                        ? (stats.generalCompleted / stats.totalEmployees) * 100 
+                        : 0}%` 
+                    }}
+                  ></div>
+                </div>
+                <span className="progress-percentage">
+                  {stats.totalEmployees > 0 
+                    ? Math.round((stats.generalCompleted / stats.totalEmployees) * 100) 
+                    : 0}% completado
+                </span>
+              </div>
+
+              <div className="progress-item">
+                <div className="progress-header">
+                  <span className="progress-label">
+                    <span className="progress-icon">🎯</span>
+                    Onboarding Técnico
+                  </span>
+                  <span className="progress-value">
+                    {stats.technicalCompleted} / {stats.totalEmployees}
+                  </span>
+                </div>
+                <div className="progress-bar-container">
+                  <div 
+                    className="progress-bar progress-bar-info"
+                    style={{ 
+                      width: `${stats.totalEmployees > 0 
+                        ? (stats.technicalCompleted / stats.totalEmployees) * 100 
+                        : 0}%` 
+                    }}
+                  ></div>
+                </div>
+                <span className="progress-percentage">
+                  {stats.totalEmployees > 0 
+                    ? Math.round((stats.technicalCompleted / stats.totalEmployees) * 100) 
+                    : 0}% completado
+                </span>
+              </div>
+
+              <div className="progress-item">
+                <div className="progress-header">
+                  <span className="progress-label">
+                    <span className="progress-icon">✅</span>
+                    Onboarding Completo
+                  </span>
+                  <span className="progress-value">
+                    {stats.bothCompleted} / {stats.totalEmployees}
+                  </span>
+                </div>
+                <div className="progress-bar-container">
+                  <div 
+                    className="progress-bar progress-bar-primary"
+                    style={{ 
+                      width: `${stats.percentageComplete || 0}%` 
+                    }}
+                  ></div>
+                </div>
+                <span className="progress-percentage">
+                  {stats.percentageComplete || 0}% completado
+                </span>
+              </div>
             </div>
-          )}
+          </Card>
+        )}
+
+        {/* Información Útil */}
+        <Card>
+          <h3>💡 Información Útil</h3>
+          <div className="info-grid">
+            <div className="info-item">
+              <div className="info-icon">📋</div>
+              <div className="info-content">
+                <h4>Tipos de Onboarding</h4>
+                <p>General (Bienvenida) y Técnico (Journey to Cloud, etc.)</p>
+              </div>
+            </div>
+            <div className="info-item">
+              <div className="info-icon">📧</div>
+              <div className="info-content">
+                <h4>Alertas Automáticas</h4>
+                <p>Se envían una semana antes del onboarding técnico</p>
+              </div>
+            </div>
+            <div className="info-item">
+              <div className="info-icon">📅</div>
+              <div className="info-content">
+                <h4>Calendario</h4>
+                <p>Visualiza las sesiones programadas por mes o año</p>
+              </div>
+            </div>
+          </div>
         </Card>
       </main>
     </div>
