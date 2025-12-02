@@ -12,21 +12,27 @@ const alertRoutes = require('./routes/Alertroutes');
 const app = express();
 
 // ==================== CONFIGURACIÓN CORS ====================
-// IMPORTANTE: Esta configuración debe ir ANTES de cualquier ruta
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Lista de orígenes permitidos
-    const allowedOrigins = [
-      'https://aprobaciones-kata-production.up.railway.app',
-      'https://aprobaciones-kata-f1j2cde47.vercel.app',
+// Obtener los orígenes permitidos desde las variables de entorno
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : [
       'http://localhost:3000',
       'http://localhost:5173'
     ];
+
+console.log('🔐 CORS configurado para los siguientes orígenes:', allowedOrigins);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permitir peticiones sin origin (Postman, apps móviles, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    // Permitir peticiones sin origin (como Postman, o misma origen)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn('⚠️ Origen rechazado por CORS:', origin);
       callback(new Error('No permitido por CORS'));
     }
   },
@@ -48,6 +54,14 @@ app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Logger de peticiones en desarrollo
+if (process.env.NODE_ENV === 'development') {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'}`);
+    next();
+  });
+}
+
 // ==================== RUTAS ====================
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
@@ -58,34 +72,58 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'API de Sistema de Gestión de Onboarding',
     version: '1.0.0',
+    environment: process.env.NODE_ENV,
     endpoints: {
       auth: '/api/auth',
       employees: '/api/employees',
-      alerts: '/api/alerts'
+      alerts: '/api/alerts',
+      health: '/api/health'
     }
   });
 });
 
 // Ruta para verificar el estado de la API
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    database: sequelize.authenticate() ? 'Connected' : 'Disconnected'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    await sequelize.authenticate();
+    res.json({ 
+      status: 'OK', 
+      timestamp: new Date().toISOString(),
+      database: 'Connected',
+      environment: process.env.NODE_ENV
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      database: 'Disconnected',
+      error: error.message
+    });
+  }
 });
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({ 
     success: false,
-    message: 'Ruta no encontrada' 
+    message: 'Ruta no encontrada',
+    path: req.path
   });
 });
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
   console.error('Error:', err);
+  
+  // Error de CORS
+  if (err.message === 'No permitido por CORS') {
+    return res.status(403).json({
+      success: false,
+      message: 'Acceso denegado por política CORS',
+      origin: req.headers.origin
+    });
+  }
+  
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Error interno del servidor',
@@ -118,7 +156,6 @@ const startServer = async () => {
       console.log('🚀 Servidor corriendo en puerto', PORT);
       console.log('🌍 Entorno:', process.env.NODE_ENV || 'development');
       console.log('📅 Fecha de inicio:', new Date().toLocaleString('es-CO'));
-      console.log('🔐 CORS configurado para:', corsOptions.origin);
     });
 
     // Manejo de cierre graceful
