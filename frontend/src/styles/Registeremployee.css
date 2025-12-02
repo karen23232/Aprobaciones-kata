@@ -1,331 +1,66 @@
+/* RegisterEmployee.css - Versión mínima */
 .register-employee-container {
     max-width: 900px;
     margin: 0 auto;
     padding: 30px 20px;
 }
 
-.register-header {
-    margin-bottom: 30px;
-}
-
 .register-header h1 {
     font-size: 32px;
     color: #1e293b;
     margin-bottom: 8px;
-    font-weight: 700;
 }
 
-.register-header .subtitle {
-    color: #64748b;
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-.back-button {
-    background: transparent;
-    border: none;
-    color: #667eea;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 8px 0;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-.back-button:hover {
-    color: #5568d3;
-    transform: translateX(-5px);
-}
-
-/* Alertas */
-.alert {
-    padding: 16px 20px;
-    border-radius: 12px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.alert-icon {
-    font-size: 20px;
-}
-
-.alert-error {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #991b1b;
-}
-
-.alert-success {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #166534;
-}
-
-/* Formulario */
 .register-form {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
+    padding: 32px;
 }
 
 .form-section {
-    padding: 32px;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.form-section:last-of-type {
-    border-bottom: none;
-}
-
-.section-title {
-    font-size: 20px;
-    color: #1e293b;
     margin-bottom: 24px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 24px;
-}
-
-.form-row:last-child {
-    margin-bottom: 0;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .form-group label {
-    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
     font-weight: 600;
-    color: #334155;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.form-group label.required::after {
-    content: "*";
-    color: #ef4444;
-    margin-left: 4px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 12px 16px;
+    width: 100%;
+    padding: 12px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    background: white;
-    color: #1e293b;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-    background: #f1f5f9;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-    line-height: 1.6;
-}
-
-.form-group small {
-    font-size: 12px;
-    color: #64748b;
-}
-
-.form-group select {
-    cursor: pointer;
-}
-
-/* Tips Section */
-.tips-section {
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    padding: 24px;
-    border-radius: 12px;
-    margin: 24px 32px;
-}
-
-.tips-section h3 {
-    font-size: 16px;
-    color: #1e293b;
-    margin-bottom: 16px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tips-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.tips-section li {
-    padding: 8px 0;
-    color: #475569;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-.tips-section li strong {
-    color: #1e293b;
-}
-
-/* Botones de acción */
 .form-actions {
-    padding: 24px 32px;
-    background: #f8fafc;
     display: flex;
-    justify-content: flex-end;
     gap: 16px;
-}
-
-.btn-primary,
-.btn-secondary {
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 24px;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .btn-secondary {
     background: white;
-    color: #64748b;
     border: 2px solid #e2e8f0;
-}
-
-.btn-secondary:hover:not(:disabled) {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-}
-
-.btn-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .register-employee-container {
-        padding: 20px 15px;
-    }
-
-    .register-header h1 {
-        font-size: 24px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .form-section {
-        padding: 24px 20px;
-    }
-
-    .tips-section {
-        margin: 20px 20px;
-        padding: 20px;
-    }
-
-    .form-actions {
-        flex-direction: column;
-        padding: 20px;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .register-header h1 {
-        font-size: 20px;
-    }
-
-    .register-header .subtitle {
-        font-size: 14px;
-    }
-
-    .section-title {
-        font-size: 18px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        font-size: 14px;
-        padding: 10px 14px;
-    }
+    padding: 12px 32px;
+    border-radius: 8px;
+    cursor: pointer;
 }
