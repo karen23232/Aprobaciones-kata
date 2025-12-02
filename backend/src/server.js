@@ -7,7 +7,7 @@ const { setupCronJobs } = require('./utils/cronJobs');
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
-const alertRoutes = require('./routes/Alertroutes');
+const alertRoutes = require('./routes/alertRoutes');
 // Si mantienes notificaciones del sistema anterior:
 // const notificationRoutes = require('./routes/notificationRoutes');
 

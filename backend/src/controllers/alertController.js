@@ -2,8 +2,8 @@ const {
   checkAndSendAlerts,
   sendManualAlert,
   resetAlert
-} = require('../services/Onboardingalertservice.js');
-const Employee = require('../models/Employee');
+} = require('../services/onboardingAlertService.js');
+const Employee = require('../models/Employee.js');
 
 // @desc    Verificar y enviar alertas automáticamente
 // @route   POST /api/alerts/check-and-send
